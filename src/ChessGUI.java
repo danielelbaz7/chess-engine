@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.text.AttributedCharacterIterator;
 
 public class ChessGUI {
 
     //creates baseframe and gets the board template
+    static JFrame gameFrame = new JFrame();
+    static JFrame titleFrame = new JFrame();
     static JFrame chessFrame = new JFrame();
     static String[][] mainBoard = Board.getBoardTemplate();
     public static JLabel[] JLabelCollection = new JLabel[64];
@@ -86,6 +89,26 @@ public class ChessGUI {
 
     }
 
+    private static void initializeTitleFrame() {
+        //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
+        JLabel titleAndCheckBox = new JLabel("Chess Engine");
+        titleAndCheckBox.setForeground(Color.BLACK);
+        JLabel authorText = new JLabel("Created By: Daniel Elbaz");
+        authorText.setForeground(Color.BLUE);
+        titleFrame.add(titleAndCheckBox);
+        chessFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        titleFrame.add(authorText);
+        titleFrame.setSize(dimension/2, dimension/6);
+        titleFrame.setVisible(true);
+
+
+        /*GridBagLayout GBL = new GridBagLayout();
+        GridBagConstraints GBC = new GridBagConstraints();
+        GBL.setConstraints();
+        titleAndCheckBox.setLayout(GBL);
+        System.out.println(titleAndCheckBox.getLayout());*/
+    }
+
     public static void placeBoardsAgain()
     {
         for(JLabel j : JLabelCollection)
@@ -96,6 +119,7 @@ public class ChessGUI {
 
     public static void startChessGUI()
     {
+        initializeTitleFrame();
         initializeChessFrame();
     }
 
