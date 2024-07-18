@@ -1,13 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.text.AttributedCharacterIterator;
 
 public class ChessGUI {
 
     //creates baseframe and gets the board template
     static JFrame gameFrame = new JFrame();
-    static JFrame titleFrame = new JFrame();
-    static JFrame chessFrame = new JFrame();
+    static JPanel titlePanel = new JPanel();
+    static JPanel chessPanel = new JPanel();
     static String[][] mainBoard = Board.getBoardTemplate();
     public static JLabel[] JLabelCollection = new JLabel[64];
     static int[] pieceSelectedAndCoordinate = new int[2];
@@ -19,7 +18,7 @@ public class ChessGUI {
     {
         System.out.println("DIMENSION " + dimension);
         //makes the frame an 8x8 grid layout
-        chessFrame.setLayout(new GridLayout(8, 8));
+        chessPanel.setLayout(new GridLayout(8, 8));
         /*iterates through each cell and sets it to either black or white,
         also chooses the proper icon based on the board template and places it on the board
          */
@@ -49,7 +48,7 @@ public class ChessGUI {
 
             //chooses correct icon for each phase of the iteration
             switch (currentPiece) {
-                case " " -> chessFrame.add(b);
+                case " " -> chessPanel.add(b);
                 case "r" -> imgSrc += "black-rook.png";
                 case "n" -> imgSrc += "black-knight.png";
                 case "b" -> imgSrc += "black-bishop.png";
@@ -78,28 +77,25 @@ public class ChessGUI {
         placeBoardsAgain();
 
         //establishes board
-        chessFrame.setSize(dimension/2, dimension/2);
-        chessFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        chessFrame.setName("Chess");
-        chessFrame.setResizable(false);
-        chessFrame.setVisible(true);
+        chessPanel.setSize(dimension/2, dimension/2);
+        chessPanel.setVisible(true);
 
         GameplayController mouseListenerController = new GameplayController();
-        chessFrame.addMouseListener(mouseListenerController);
+        chessPanel.addMouseListener(mouseListenerController);
 
     }
 
     private static void initializeTitleFrame() {
         //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
         JLabel titleAndCheckBox = new JLabel("Chess Engine");
+        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         titleAndCheckBox.setForeground(Color.BLACK);
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
         authorText.setForeground(Color.BLUE);
-        titleFrame.add(titleAndCheckBox);
-        chessFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        titleFrame.add(authorText);
-        titleFrame.setSize(dimension/2, dimension/6);
-        titleFrame.setVisible(true);
+        titlePanel.add(titleAndCheckBox);
+        titlePanel.setPreferredSize(new Dimension(dimension/2, dimension/12));
+        titlePanel.add(authorText);
+        titlePanel.setVisible(true);
 
 
         /*GridBagLayout GBL = new GridBagLayout();
@@ -113,7 +109,7 @@ public class ChessGUI {
     {
         for(JLabel j : JLabelCollection)
         {
-            chessFrame.add(j);
+            chessPanel.add(j);
         }
     }
 
@@ -121,6 +117,13 @@ public class ChessGUI {
     {
         initializeTitleFrame();
         initializeChessFrame();
+        gameFrame.setResizable(false);
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setLayout(new BorderLayout());
+        gameFrame.add(chessPanel, BorderLayout.CENTER);
+        gameFrame.add(titlePanel, BorderLayout.NORTH);
+        gameFrame.setSize(dimension/2, (int) (chessPanel.getHeight() + titlePanel.getPreferredSize().getHeight()));
+        gameFrame.setVisible(true);
     }
 
     public static int isPieceSelected() {
