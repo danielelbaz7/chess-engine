@@ -127,12 +127,6 @@ public class Board {
         return (double) Math.round(totalScore * 100) /100;
     }
 
-    //gets the boards to use for gui and eval functions
-    public static int[][] getBitboards()
-    {
-        return pieceBoards;
-    }
-
     public static String[][] getBoardTemplate()
     {
         return boardTemplate;
