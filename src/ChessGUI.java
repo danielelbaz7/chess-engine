@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import java.awt.*;
 
 public class ChessGUI {
@@ -8,6 +7,7 @@ public class ChessGUI {
     static JFrame gameFrame = new JFrame();
     static JPanel titlePanel = new JPanel();
     static JPanel chessPanel = new JPanel();
+    static JPanel evaluationPanel = new JPanel();
     static String[][] mainBoard = Board.getBoardTemplate();
     public static JLabel[] JLabelCollection = new JLabel[64];
     static int[] pieceSelectedAndCoordinate = new int[2];
@@ -15,7 +15,7 @@ public class ChessGUI {
             Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 
     //creates chessboard gui
-    private static void initializeChessFrame()
+    private static void initializeChessPanel()
     {
         System.out.println("DIMENSION " + dimension);
         //makes the frame an 8x8 grid layout
@@ -78,7 +78,6 @@ public class ChessGUI {
         placeBoardsAgain();
 
         //establishes board
-        chessPanel.setSize(dimension/2, dimension/2);
         chessPanel.setVisible(true);
 
         GameplayController mouseListenerController = new GameplayController();
@@ -86,12 +85,12 @@ public class ChessGUI {
 
     }
 
-    private static void initializeTitleFrame() {
+    private static void initializeTitlePanel() {
         //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
         titlePanel.setLayout(new GridLayout(1, 3));
 
         JLabel titleAndCheckBox = new JLabel("Chess Engine");
-        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/50));
         titleAndCheckBox.setForeground(Color.BLACK);
 
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
@@ -103,15 +102,16 @@ public class ChessGUI {
         titlePanel.add(titleAndCheckBox);
         titlePanel.add(authorText);
         titlePanel.add(showEvaluation);
-        titlePanel.setPreferredSize(new Dimension(dimension/2, dimension/30));
         titlePanel.setVisible(true);
 
+    }
 
-        /*GridBagLayout GBL = new GridBagLayout();
-        GridBagConstraints GBC = new GridBagConstraints();
-        GBL.setConstraints();
-        titleAndCheckBox.setLayout(GBL);
-        System.out.println(titleAndCheckBox.getLayout());*/
+    private static void initializeEvaluationPanel() {
+        //creates eval panel with a box that grows in height depending on who is winning
+        JLabel evaluationValue = new JLabel(String.valueOf(Board.evaluationValue));
+        evaluationValue.setForeground(Color.BLACK);
+        evaluationPanel.add(evaluationValue);
+        evaluationPanel.setVisible(true);
     }
 
     public static void placeBoardsAgain()
@@ -124,14 +124,28 @@ public class ChessGUI {
 
     public static void startChessGUI()
     {
-        initializeTitleFrame();
-        initializeChessFrame();
+        initializeChessPanel();
+        initializeTitlePanel();
+        initializeEvaluationPanel();
+
         gameFrame.setResizable(false);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setLayout(new BorderLayout());
+
+        chessPanel.setSize(dimension/2, dimension/2);
+        titlePanel.setPreferredSize(new Dimension((int)
+                (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()), dimension/30));
+
+        evaluationPanel.setPreferredSize
+                (new Dimension(dimension/30, (int) ((dimension/2) + titlePanel.getPreferredSize().getHeight())));
+
         gameFrame.add(chessPanel, BorderLayout.CENTER);
         gameFrame.add(titlePanel, BorderLayout.NORTH);
-        gameFrame.setSize(dimension/2, (int) (chessPanel.getHeight() + titlePanel.getPreferredSize().getHeight()));
+        gameFrame.add(evaluationPanel, BorderLayout.WEST);
+        //sets the size to accommodate the other pieces of the window
+        System.out.println(evaluationPanel.getPreferredSize().getWidth());
+        gameFrame.setSize((int) (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()),
+                (int) (chessPanel.getHeight() + titlePanel.getPreferredSize().getHeight()));
         gameFrame.setVisible(true);
     }
 

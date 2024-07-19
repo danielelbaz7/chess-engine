@@ -10,6 +10,7 @@ public class Board {
             whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing, whitePawns};
 
     //determines side to move
+    static double evaluationValue = 0;
     static boolean whiteTurn = true;
     static boolean[] kingsChecked = {false, false};
     static int[] kingLocations = {-1, -1};
