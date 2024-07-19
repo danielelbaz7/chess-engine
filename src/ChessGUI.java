@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 
 public class ChessGUI {
@@ -26,7 +27,7 @@ public class ChessGUI {
         {
             JLabel b = new JLabel();
             b.setOpaque(true);
-            String imgSrc = "src/Assets/";
+            String imgSrc = "./src/Assets/";
 
             String currentPiece = mainBoard[2+(i/8)][1+(i%8)];
 
@@ -87,14 +88,22 @@ public class ChessGUI {
 
     private static void initializeTitleFrame() {
         //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
+        titlePanel.setLayout(new GridLayout(1, 3));
+
         JLabel titleAndCheckBox = new JLabel("Chess Engine");
         titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         titleAndCheckBox.setForeground(Color.BLACK);
+
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
         authorText.setForeground(Color.BLUE);
+
+        JCheckBox showEvaluation = new JCheckBox();
+        showEvaluation.setText("Show evaluation?");
+
         titlePanel.add(titleAndCheckBox);
-        titlePanel.setPreferredSize(new Dimension(dimension/2, dimension/12));
         titlePanel.add(authorText);
+        titlePanel.add(showEvaluation);
+        titlePanel.setPreferredSize(new Dimension(dimension/2, dimension/30));
         titlePanel.setVisible(true);
 
 
