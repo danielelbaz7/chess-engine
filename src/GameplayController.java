@@ -9,12 +9,14 @@ public class GameplayController implements MouseListener {
     int selectedPiece = -1;
     HashSet<Integer> possibleMovesForSelectedPiece = null;
     int selectedPieceType = -1;
-    Board board = new Board();
-    ValidMoves vm = new ValidMoves(board);
+    Board board;
+    ValidMoves vm;
     ChessGUI chessGUI;
 
     public GameplayController(ChessGUI c) {
         this.chessGUI = c;
+        board = chessGUI.board;
+        vm = new ValidMoves(board);
     }
 
     //makes the selected square gray and the possible moves red
@@ -190,6 +192,7 @@ public class GameplayController implements MouseListener {
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
             board.evaluationValue = board.evaluateBoard(board.pieceBoards, board.whiteTurn);
+            System.out.println(board.evaluationValue);
             chessGUI.evaluationValue.setText(String.valueOf(board.evaluationValue));
             int sideToCheck = board.whiteTurn ? 1 : 0;
             int otherSide = sideToCheck == 1 ? 0 : 1;

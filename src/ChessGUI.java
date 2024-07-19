@@ -19,6 +19,7 @@ public class ChessGUI {
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
             Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 
+    //sets the board to the board passed and creates the chess gui
     public ChessGUI(Board b) {
         this.board = b;
         evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
@@ -123,10 +124,10 @@ public class ChessGUI {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
-                    //evaluationValue.setVisible(true);
+                    evaluationValue.setVisible(true);
                 }
                 else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                    //evaluationValue.setVisible(false);
+                    evaluationValue.setVisible(false);
                 }
             }
         });

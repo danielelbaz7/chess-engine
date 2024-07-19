@@ -20,7 +20,7 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
-    private Board board;
+    private final Board board;
 
     public ValidMoves(Board b) {
         this.board = b;
@@ -51,11 +51,6 @@ public class ValidMoves {
             case 11 -> possibleWhitePawnMoves(location, bitboards);
             default -> possibleMoves;
         };
-
-        //
-        if(!Arrays.deepEquals(bitboards, board.pieceBoards)) {
-            return possibleMoves;
-        }
 
         return possibleMoves;
     }
