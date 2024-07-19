@@ -18,11 +18,6 @@ public class Board {
     int[] kingLocations = {-1, -1};
     final ValidMoves vm = new ValidMoves(this);
 
-    public Board() {
-        this.generateBoards();
-        evaluationValue = evaluateBoard(pieceBoards, whiteTurn);
-    }
-
     //creates a default board template used to generate the bitboards
     private static final String[][] boardTemplate = {
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
@@ -38,6 +33,11 @@ public class Board {
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"}
     };
+
+    public Board() {
+        this.generateBoards();
+        evaluationValue = evaluateBoard(pieceBoards, whiteTurn);
+    }
 
     //initializes the bitboards
     private void createBitboards(int[][] bitboards)

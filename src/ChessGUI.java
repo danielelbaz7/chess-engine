@@ -10,17 +10,19 @@ public class ChessGUI {
     JFrame gameFrame = new JFrame();
     JPanel titlePanel = new JPanel();
     boolean showEvaluationPanel = false;
-    JLabel evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
+    JLabel evaluationValue;
     JPanel chessPanel = new JPanel();
     JPanel evaluationPanel = new JPanel();
     String[][] mainBoard = Board.getBoardTemplate();
-    public JLabel[] JLabelCollection = new JLabel[64];
+    public JLabel[] JLabelCollection;
     int[] pieceSelectedAndCoordinate = new int[2];
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
             Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 
     public ChessGUI(Board b) {
         this.board = b;
+        evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
+        JLabelCollection = new JLabel[64];
     }
 
     //creates chessboard gui
