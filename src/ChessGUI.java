@@ -9,8 +9,7 @@ public class ChessGUI {
     Board board;
     JFrame gameFrame = new JFrame();
     JPanel titlePanel = new JPanel();
-    boolean showEvaluationPanel = false;
-    JLabel evaluationValue;
+    JLabel evaluationValuePanel;
     JPanel chessPanel = new JPanel();
     JPanel evaluationPanel = new JPanel();
     String[][] mainBoard = Board.getBoardTemplate();
@@ -22,7 +21,7 @@ public class ChessGUI {
     //sets the board to the board passed and creates the chess gui
     public ChessGUI(Board b) {
         this.board = b;
-        evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
+        evaluationValuePanel = new JLabel(String.valueOf(board.evaluationValue));
         JLabelCollection = new JLabel[64];
         this.startChessGUI();
     }
@@ -124,10 +123,10 @@ public class ChessGUI {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
-                    evaluationValue.setVisible(true);
+                    evaluationValuePanel.setVisible(true);
                 }
                 else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                    evaluationValue.setVisible(false);
+                    evaluationValuePanel.setVisible(false);
                 }
             }
         });
@@ -138,9 +137,9 @@ public class ChessGUI {
     private void initializeEvaluationPanel() {
         //creates eval panel with a box that grows in height depending on who is winning
         //set to black for visibility, temporary
-        evaluationValue.setForeground(Color.BLACK);
-        evaluationValue.setVisible(false);
-        evaluationPanel.add(evaluationValue);
+        evaluationValuePanel.setForeground(Color.BLACK);
+        evaluationValuePanel.setVisible(false);
+        evaluationPanel.add(evaluationValuePanel);
         evaluationPanel.setVisible(true);
     }
 

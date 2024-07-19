@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -192,8 +191,15 @@ public class GameplayController implements MouseListener {
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
             board.evaluationValue = board.evaluateBoard(board.pieceBoards, board.whiteTurn);
-            System.out.println(board.evaluationValue);
-            chessGUI.evaluationValue.setText(String.valueOf(board.evaluationValue));
+            if(Math.abs(board.evaluationValue) != 1000) {
+                chessGUI.evaluationValuePanel.setText(String.valueOf(board.evaluationValue));
+            }
+            else {
+                switch((int) board.evaluationValue) {
+                    case -1000 -> chessGUI.evaluationValuePanel.setText("-M");
+                    case 1000 -> chessGUI.evaluationValuePanel.setText("M");
+                }
+            }
             int sideToCheck = board.whiteTurn ? 1 : 0;
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if(board.kingsChecked[otherSide]) {
@@ -201,7 +207,6 @@ public class GameplayController implements MouseListener {
             }
             else if(board.isKingChecked(board.pieceBoards, sideToCheck, board.kingLocations)) {
                 board.kingsChecked[sideToCheck] = true;
-                System.out.println("SIDE TO CHECK " + sideToCheck);
                 //game over is printed outside the method as isCheckMated is used in simulation as well
                 if(vm.allAvailableMoves(board.pieceBoards, sideToCheck).isEmpty()) {
                     System.out.println("GAME OVER");
