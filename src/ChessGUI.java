@@ -103,14 +103,14 @@ public class ChessGUI {
         authorText.setForeground(Color.BLUE);
 
         JCheckBox showEvaluationCheckBox = new JCheckBox();
-        showEvaluationCheckBox.addActionListener(new ItemListener() {
+        showEvaluationCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
+                    evaluationPanel.setVisible(true);
                 }
                 else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                    evaluationPanel.setBackground(Color.BLACK);
-                    evaluationValue.setText("");
+                    evaluationPanel.setVisible(false);
                 }
             }
         });
