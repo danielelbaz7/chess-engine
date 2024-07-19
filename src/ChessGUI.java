@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 public class ChessGUI {
 
@@ -10,6 +11,7 @@ public class ChessGUI {
     static JFrame gameFrame = new JFrame();
     static JPanel titlePanel = new JPanel();
     static boolean showEvaluationPanel = false;
+    static JLabel evaluationValue = new JLabel(String.valueOf(Board.evaluationValue));
     static JPanel chessPanel = new JPanel();
     static JPanel evaluationPanel = new JPanel();
     static String[][] mainBoard = Board.getBoardTemplate();
@@ -100,30 +102,31 @@ public class ChessGUI {
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
         authorText.setForeground(Color.BLUE);
 
-        JCheckBox showEvaluation = new JCheckBox();
-        showEvaluation.addActionListener(new ActionListener() {
-
+        JCheckBox showEvaluationCheckBox = new JCheckBox();
+        showEvaluationCheckBox.addActionListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.equals(ItemEvent.SELECTED)) {
-                } else if(e.equals(ItemEvent.DESELECTED)) {
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED) {
                 }
-
+                else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                    evaluationPanel.setBackground(Color.BLACK);
+                    evaluationValue.setText("");
+                }
             }
         });
-        showEvaluation.setText("Show evaluation?");
+        showEvaluationCheckBox.setText("Show evaluation?");
 
         titlePanel.add(titleAndCheckBox);
         titlePanel.add(authorText);
-        titlePanel.add(showEvaluation);
+        titlePanel.add(showEvaluationCheckBox);
         titlePanel.setVisible(true);
 
     }
 
     private static void initializeEvaluationPanel() {
         //creates eval panel with a box that grows in height depending on who is winning
-        JLabel evaluationValue = new JLabel(String.valueOf(Board.evaluationValue));
-        evaluationValue.setForeground(Color.WHITE);
+        //set to black for visibility, temporary
+        evaluationValue.setForeground(Color.BLACK);
         evaluationPanel.add(evaluationValue);
         evaluationPanel.setVisible(true);
     }

@@ -184,7 +184,7 @@ public class GameplayController implements MouseListener {
             Board.pieceBoards = movePiece(row, col, Board.pieceBoards);
             //resets to find new evaluation value
             Board.evaluationValue = Board.evaluateBoard(Board.pieceBoards);
-            ChessGUI.evaluationPanel.add(new JLabel(String.valueOf(Board.evaluationValue)));
+            ChessGUI.evaluationValue.setText(String.valueOf(Board.evaluationValue));
             int sideToCheck = Board.whiteTurn ? 1 : 0;
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if(Board.kingsChecked[otherSide]) {
