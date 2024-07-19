@@ -1,27 +1,30 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 public class ChessGUI {
 
     //creates baseframe and gets the board template
-    static JFrame gameFrame = new JFrame();
-    static JPanel titlePanel = new JPanel();
-    static boolean showEvaluationPanel = false;
-    static JLabel evaluationValue = new JLabel(String.valueOf(Board.evaluationValue));
-    static JPanel chessPanel = new JPanel();
-    static JPanel evaluationPanel = new JPanel();
-    static String[][] mainBoard = Board.getBoardTemplate();
-    public static JLabel[] JLabelCollection = new JLabel[64];
-    static int[] pieceSelectedAndCoordinate = new int[2];
+    Board board;
+    JFrame gameFrame = new JFrame();
+    JPanel titlePanel = new JPanel();
+    boolean showEvaluationPanel = false;
+    JLabel evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
+    JPanel chessPanel = new JPanel();
+    JPanel evaluationPanel = new JPanel();
+    String[][] mainBoard = Board.getBoardTemplate();
+    public JLabel[] JLabelCollection = new JLabel[64];
+    int[] pieceSelectedAndCoordinate = new int[2];
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
             Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 
+    public ChessGUI(Board b) {
+        this.board = b;
+    }
+
     //creates chessboard gui
-    private static void initializeChessPanel()
+    private void initializeChessPanel()
     {
         System.out.println("DIMENSION " + dimension);
         //makes the frame an 8x8 grid layout
@@ -91,7 +94,7 @@ public class ChessGUI {
 
     }
 
-    private static void initializeTitlePanel() {
+    private void initializeTitlePanel() {
         //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
         titlePanel.setLayout(new GridLayout(1, 3));
 
@@ -102,19 +105,7 @@ public class ChessGUI {
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
         authorText.setForeground(Color.BLUE);
 
-        JCheckBox showEvaluationCheckBox = new JCheckBox();
-        showEvaluationCheckBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                    evaluationPanel.setVisible(true);
-                }
-                else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                    evaluationPanel.setVisible(false);
-                }
-            }
-        });
-        showEvaluationCheckBox.setText("Show evaluation?");
+        JCheckBox showEvaluationCheckBox = getEvaluationCheckBox();
 
         titlePanel.add(titleAndCheckBox);
         titlePanel.add(authorText);
@@ -123,15 +114,33 @@ public class ChessGUI {
 
     }
 
-    private static void initializeEvaluationPanel() {
+    private JCheckBox getEvaluationCheckBox() {
+        JCheckBox showEvaluationCheckBox = new JCheckBox();
+        showEvaluationCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED) {
+                    //evaluationValue.setVisible(true);
+                }
+                else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                    //evaluationValue.setVisible(false);
+                }
+            }
+        });
+        showEvaluationCheckBox.setText("Show evaluation?");
+        return showEvaluationCheckBox;
+    }
+
+    private void initializeEvaluationPanel() {
         //creates eval panel with a box that grows in height depending on who is winning
         //set to black for visibility, temporary
         evaluationValue.setForeground(Color.BLACK);
+        evaluationValue.setVisible(false);
         evaluationPanel.add(evaluationValue);
         evaluationPanel.setVisible(true);
     }
 
-    public static void placeBoardsAgain()
+    public void placeBoardsAgain()
     {
         for(JLabel j : JLabelCollection)
         {
@@ -139,17 +148,17 @@ public class ChessGUI {
         }
     }
 
-    public static void drawEvalBar() {
+    public void drawEvalBar() {
         //resets eval bar
         for(int j = 0; j < 100; j++) {
             evaluationPanel.setForeground(Color.WHITE);
         }
-        for(int i = 0; i < Math.round(Board.evaluationValue); i++) {
+        for(int i = 0; i < Math.round(board.evaluationValue); i++) {
 
         }
     }
 
-    public static void startChessGUI()
+    public void startChessGUI()
     {
         initializeChessPanel();
         initializeTitlePanel();
@@ -178,21 +187,21 @@ public class ChessGUI {
         gameFrame.setVisible(true);
     }
 
-    public static int isPieceSelected() {
+    public int isPieceSelected() {
         return pieceSelectedAndCoordinate[0];
     }
 
-    public static int getPointSelected()
+    public int getPointSelected()
     {
         if(pieceSelectedAndCoordinate[0] == 0) { return -1; }
         return pieceSelectedAndCoordinate[1];
     }
 
-    public static void setPieceSelectedTrue(int row, int col) {
+    public void setPieceSelectedTrue(int row, int col) {
         pieceSelectedAndCoordinate[0] = 1;
         pieceSelectedAndCoordinate[1] = ((row*8) + col);
     }
-    public static void setPieceSelectedFalse() {
+    public void setPieceSelectedFalse() {
         pieceSelectedAndCoordinate[0] = 0;
         pieceSelectedAndCoordinate[1] = -1;
     }
