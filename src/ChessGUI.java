@@ -23,6 +23,7 @@ public class ChessGUI {
         this.board = b;
         evaluationValue = new JLabel(String.valueOf(board.evaluationValue));
         JLabelCollection = new JLabel[64];
+        this.startChessGUI();
     }
 
     //creates chessboard gui
@@ -91,7 +92,7 @@ public class ChessGUI {
         //establishes board
         chessPanel.setVisible(true);
 
-        GameplayController mouseListenerController = new GameplayController();
+        GameplayController mouseListenerController = new GameplayController(this);
         chessPanel.addMouseListener(mouseListenerController);
 
     }

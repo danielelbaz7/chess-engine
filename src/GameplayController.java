@@ -11,7 +11,11 @@ public class GameplayController implements MouseListener {
     int selectedPieceType = -1;
     Board board = new Board();
     ValidMoves vm = new ValidMoves(board);
-    ChessGUI chessGUI = new ChessGUI(board);
+    ChessGUI chessGUI;
+
+    public GameplayController(ChessGUI c) {
+        this.chessGUI = c;
+    }
 
     //makes the selected square gray and the possible moves red
     private void setPieceSelectedGUI(int rowpass, int colpass)

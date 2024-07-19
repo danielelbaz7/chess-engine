@@ -362,7 +362,6 @@ public class ValidMoves {
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
     public boolean willThisMovePutOurKingInCheck(int currentLocation, int currentBitboard, int nextLocation, int nextBitboard) {
 
-        GameplayController tempGC = new GameplayController();
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
         int[] tempKingLocations = Arrays.copyOf(board.kingLocations, 2);

@@ -3,7 +3,6 @@ public class Main {
 
         Board gameBoard = new Board();
         ChessGUI chessGUI = new ChessGUI(gameBoard);
-        chessGUI.startChessGUI();
         System.out.println();
 
     }
