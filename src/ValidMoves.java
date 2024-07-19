@@ -20,6 +20,11 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
+    private final Board board;
+
+    public ValidMoves(Board b) {
+        this.board = b;
+    }
 
     public HashSet<Integer> possibleMoveFinderAllPieces(int location, int[][] bitboards) {
         HashSet<Integer> possibleMoves = new HashSet<>();
@@ -46,10 +51,6 @@ public class ValidMoves {
             case 11 -> possibleWhitePawnMoves(location, bitboards);
             default -> possibleMoves;
         };
-
-        if(!Arrays.deepEquals(bitboards, Board.pieceBoards)) {
-            return possibleMoves;
-        }
 
         return possibleMoves;
     }
@@ -352,32 +353,17 @@ public class ValidMoves {
         return new HashSet<Integer>(totalPossibleMoves);
     }
 
-    public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
-        int otherSide = side == 1 ? 0 : 1;
-        HashSet<Integer> totalPossibleMoves = new HashSet<>();
-        //looks through enemy pieces and finds their possible moves
-        for (int i = otherSide * 6; i < otherSide*6 + 6; i++) {
-            for (int j = 0; j < bitboards[0].length; j++) {
-                if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.addAll(possibleMoveFinderAllPieces(j, bitboards));
-                }
-            }
-        }
-        return totalPossibleMoves.contains(kingLocations[side] + 100);
-    }
-
     //returns if the move will put the king in check
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
     public boolean willThisMovePutOurKingInCheck(int currentLocation, int currentBitboard, int nextLocation, int nextBitboard) {
 
-        GameplayController tempGC = new GameplayController();
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
-        int[] tempKingLocations = Arrays.copyOf(Board.kingLocations, 2);
+        int[] tempKingLocations = Arrays.copyOf(board.kingLocations, 2);
 
 
         for(int i = 0; i < 12; i++) {
-            System.arraycopy(Board.pieceBoards[i], 0, tempBitboards[i], 0, 120);
+            System.arraycopy(board.pieceBoards[i], 0, tempBitboards[i], 0, 120);
         }
 
         //simulates move change
@@ -391,7 +377,7 @@ public class ValidMoves {
             System.out.println("The new king location is " + nextLocation);
         }
 
-        return isKingChecked(tempBitboards, currentBitboard/6, tempKingLocations);
+        return board.isKingChecked(tempBitboards, currentBitboard/6, tempKingLocations);
     }
 
     //finds all possible moves for a side

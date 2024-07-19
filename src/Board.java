@@ -1,18 +1,22 @@
+import java.util.HashSet;
+
 public class Board {
 
     //declares white pieces
-    static int[] whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing, whitePawns = new int[120];
+    int[] whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing, whitePawns = new int[120];
 
     //black pieces
-    static int[] blackRooks, blackKnights, blackBishops, blackQueen, blackKing, blackPawns = new int[120];
+    int[] blackRooks, blackKnights, blackBishops, blackQueen, blackKing, blackPawns = new int[120];
 
-    static int[][] pieceBoards = {blackRooks, blackKnights, blackBishops, blackQueen, blackKing, blackPawns,
+    int[][] pieceBoards = {blackRooks, blackKnights, blackBishops, blackQueen, blackKing, blackPawns,
             whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing, whitePawns};
 
     //determines side to move
-    static boolean whiteTurn = true;
-    static boolean[] kingsChecked = {false, false};
-    static int[] kingLocations = {-1, -1};
+    double evaluationValue = 0;
+    boolean whiteTurn = true;
+    boolean[] kingsChecked = {false, false};
+    int[] kingLocations = {-1, -1};
+    final ValidMoves vm = new ValidMoves(this);
 
     //creates a default board template used to generate the bitboards
     private static final String[][] boardTemplate = {
@@ -30,8 +34,13 @@ public class Board {
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"}
     };
 
+    public Board() {
+        this.generateBoards();
+        evaluationValue = evaluateBoard(pieceBoards, whiteTurn);
+    }
+
     //initializes the bitboards
-    private static void createBitboards(int[][] bitboards)
+    private void createBitboards(int[][] bitboards)
     {
         //runs the creator for each individual board
         for(int i = 0; i < 12; i++)
@@ -68,7 +77,7 @@ public class Board {
     }
 
     //sets the boardlist to the newly generated boards and prints the board to the console
-    public static void generateBoards()
+    public void generateBoards()
     {
         createBitboards(pieceBoards);
         for(int i = 0; i < 120; i++)
@@ -82,7 +91,7 @@ public class Board {
     }
 
     //gui usage
-    public static boolean isThereAPieceThere(int rowpass, int colpass)
+    public boolean isThereAPieceThere(int rowpass, int colpass)
     {
         int startingIndex = 0;
         if(Boolean.TRUE.equals(whiteTurn)) {
@@ -97,22 +106,50 @@ public class Board {
         return false;
     }
 
-    //evaluates which side is winning and by how much
-    public static double evaluateBoard(int[][] bitboards) {
-        double totalScore = 0;
-        for(int i = 0; i < 12; i++) {
-            double baseValue = 0;
-            switch (i) {
-                case 0: baseValue = -5; break;
-                case 1, 2: baseValue = -3; break;
-                case 3: baseValue = -9; break;
-                case 4, 10: baseValue = 0; break;
-                case 5: baseValue = -1; break;
-                case 6: baseValue = 5; break;
-                case 7, 8: baseValue = 3; break;
-                case 9: baseValue = 9; break;
-                case 11: baseValue = 1; break;
+    //moved to board as it made more sense, checks the current board value
+    //no longer static to remove static global state
+
+    public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
+        int otherSide = side == 1 ? 0 : 1;
+        HashSet<Integer> totalPossibleMoves = new HashSet<>();
+        //looks through enemy pieces and finds their possible moves
+        for (int i = otherSide * 6; i < otherSide*6 + 6; i++) {
+            for (int j = 0; j < bitboards[0].length; j++) {
+                if (bitboards[i][j] == 1) {
+                    totalPossibleMoves.addAll(vm.possibleMoveFinderAllPieces(j, bitboards));
+                }
             }
+        }
+        return totalPossibleMoves.contains(kingLocations[side] + 100);
+    }
+
+    //evaluates which side is winning and by how much
+    public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn) {
+        double totalScore = 0;
+        int sideToCheck = isWhiteTurn ? 1 : 0;
+        if(isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
+            if(sideToCheck == 1) {
+                totalScore = -1000;
+                return totalScore;
+            }
+            else {
+                totalScore = 1000;
+                return totalScore;
+            }
+        }
+        for(int i = 0; i < 12; i++) {
+            double baseValue = switch (i) {
+                case 0 -> -5;
+                case 1, 2 -> -3;
+                case 3 -> -9;
+                case 4, 10 -> 0;
+                case 5 -> -1;
+                case 6 -> 5;
+                case 7, 8 -> 3;
+                case 9 -> 9;
+                case 11 -> 1;
+                default -> 0;
+            };
             //runs through each bitboard, checks if there is a piece there
             for(int j = 0; j < bitboards[i].length; j++) {
                 if(bitboards[i][j] == 1) {
@@ -124,12 +161,6 @@ public class Board {
             }
         }
         return (double) Math.round(totalScore * 100) /100;
-    }
-
-    //gets the boards to use for gui and eval functions
-    public static int[][] getBitboards()
-    {
-        return pieceBoards;
     }
 
     public static String[][] getBoardTemplate()
