@@ -109,7 +109,7 @@ public class ChessGUI {
     private static void initializeEvaluationPanel() {
         //creates eval panel with a box that grows in height depending on who is winning
         JLabel evaluationValue = new JLabel(String.valueOf(Board.evaluationValue));
-        evaluationValue.setForeground(Color.BLACK);
+        evaluationValue.setForeground(Color.WHITE);
         evaluationPanel.add(evaluationValue);
         evaluationPanel.setVisible(true);
     }
@@ -119,6 +119,16 @@ public class ChessGUI {
         for(JLabel j : JLabelCollection)
         {
             chessPanel.add(j);
+        }
+    }
+
+    public static void drawEvalBar() {
+        //resets eval bar
+        for(int j = 0; j < 100; j++) {
+            evaluationPanel.setForeground(Color.WHITE);
+        }
+        for(int i = 0; i < Math.round(Board.evaluationValue); i++) {
+
         }
     }
 
@@ -142,6 +152,7 @@ public class ChessGUI {
         gameFrame.add(chessPanel, BorderLayout.CENTER);
         gameFrame.add(titlePanel, BorderLayout.NORTH);
         gameFrame.add(evaluationPanel, BorderLayout.WEST);
+
         //sets the size to accommodate the other pieces of the window
         System.out.println(evaluationPanel.getPreferredSize().getWidth());
         gameFrame.setSize((int) (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()),
