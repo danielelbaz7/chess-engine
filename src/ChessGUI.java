@@ -1,11 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 
 public class ChessGUI {
 
     //creates baseframe and gets the board template
     static JFrame gameFrame = new JFrame();
     static JPanel titlePanel = new JPanel();
+    static boolean showEvaluationPanel = false;
     static JPanel chessPanel = new JPanel();
     static JPanel evaluationPanel = new JPanel();
     static String[][] mainBoard = Board.getBoardTemplate();
@@ -97,6 +101,16 @@ public class ChessGUI {
         authorText.setForeground(Color.BLUE);
 
         JCheckBox showEvaluation = new JCheckBox();
+        showEvaluation.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.equals(ItemEvent.SELECTED)) {
+                } else if(e.equals(ItemEvent.DESELECTED)) {
+                }
+
+            }
+        });
         showEvaluation.setText("Show evaluation?");
 
         titlePanel.add(titleAndCheckBox);
@@ -148,6 +162,7 @@ public class ChessGUI {
 
         evaluationPanel.setPreferredSize
                 (new Dimension(dimension/30, (int) ((dimension/2) + titlePanel.getPreferredSize().getHeight())));
+
 
         gameFrame.add(chessPanel, BorderLayout.CENTER);
         gameFrame.add(titlePanel, BorderLayout.NORTH);
