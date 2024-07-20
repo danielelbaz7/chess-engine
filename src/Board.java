@@ -128,13 +128,14 @@ public class Board {
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
         if(isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
-            if(sideToCheck == 1) {
-                totalScore = -1000;
-                return totalScore;
-            }
-            else {
-                totalScore = 1000;
-                return totalScore;
+            if(vm.allAvailableMoves(pieceBoards, sideToCheck).isEmpty()) {
+                if (sideToCheck == 1) {
+                    totalScore = -1000;
+                    return totalScore;
+                } else {
+                    totalScore = 1000;
+                    return totalScore;
+                }
             }
         }
         for(int i = 0; i < 12; i++) {
