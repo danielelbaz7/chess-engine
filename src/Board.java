@@ -1,4 +1,6 @@
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class Board {
 
@@ -111,16 +113,16 @@ public class Board {
 
     public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
         int otherSide = side == 1 ? 0 : 1;
-        HashSet<Integer> totalPossibleMoves = new HashSet<>();
+        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
         //looks through enemy pieces and finds their possible moves
         for (int i = otherSide * 6; i < otherSide*6 + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
                 if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.addAll(vm.possibleMoveFinderAllPieces(j, bitboards));
+                    totalPossibleMoves.putAll(vm.possibleMoveFinderAllPieces(j, bitboards));
                 }
             }
         }
-        return totalPossibleMoves.contains(kingLocations[side] + 100);
+        return totalPossibleMoves.containsKey(kingLocations[side] + 100);
     }
 
     //evaluates which side is winning and by how much
@@ -163,19 +165,19 @@ public class Board {
         }
 
         double addOrRemove = 0;
-        HashSet<Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
+        HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
 
-        for(int move : allMovesWhite) {
-            if(move > 100) {
+        for(Map.Entry<Integer, Integer> move : allMovesWhite.entrySet()) {
+            if(move.getKey() > 100) {
                 addOrRemove += 0.35;
                 continue;
             }
             addOrRemove += 0.05;
         }
 
-        HashSet<Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
-        for(int move : allMovesBlack) {
-            if(move > 100) {
+        HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
+        for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
+            if(move.getKey() > 100) {
                 addOrRemove -= 0.35;
                 continue;
             }
