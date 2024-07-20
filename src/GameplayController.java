@@ -51,6 +51,7 @@ public class GameplayController implements MouseListener {
         possibleMovesForSelectedPiece.removeAll(movesToRemove);
         System.out.println("Possible moves are: " + possibleMovesForSelectedPiece);
 
+        //removes king from possible moves if in check
         if(possibleMovesForSelectedPiece.contains(board.kingLocations[otherSide] + 100)) {
             possibleMovesForSelectedPiece.remove(board.kingLocations[otherSide] + 100);
             board.kingsChecked[0] = true;

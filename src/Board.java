@@ -161,6 +161,28 @@ public class Board {
                 }
             }
         }
+
+        double addOrRemove = 0;
+        HashSet<Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
+
+        for(int move : allMovesWhite) {
+            if(move > 100) {
+                addOrRemove += 0.35;
+                continue;
+            }
+            addOrRemove += 0.05;
+        }
+
+        HashSet<Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
+        for(int move : allMovesBlack) {
+            if(move > 100) {
+                addOrRemove -= 0.35;
+                continue;
+            }
+            addOrRemove -= 0.05;
+        }
+
+        totalScore += addOrRemove;
         return (double) Math.round(totalScore * 100) /100;
     }
 
