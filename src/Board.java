@@ -122,7 +122,7 @@ public class Board {
                 }
             }
         }
-        return totalPossibleMoves.containsKey(kingLocations[side] + 100);
+        return totalPossibleMoves.containsKey(kingLocations[side]);
     }
 
     //evaluates which side is winning and by how much
@@ -168,7 +168,7 @@ public class Board {
         HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
 
         for(Map.Entry<Integer, Integer> move : allMovesWhite.entrySet()) {
-            if(move.getKey() > 100) {
+            if(move.getValue() != -1) {
                 addOrRemove += 0.35;
                 continue;
             }
@@ -177,7 +177,7 @@ public class Board {
 
         HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
         for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
-            if(move.getKey() > 100) {
+            if(move.getValue() != -1) {
                 addOrRemove -= 0.35;
                 continue;
             }

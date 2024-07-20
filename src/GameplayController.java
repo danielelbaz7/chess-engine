@@ -35,9 +35,8 @@ public class GameplayController implements MouseListener {
 
         //iterates through all possible moves and put moves that check into a hashset to avoid concurrent modification exception
         HashMap<Integer, Integer> movesToRemove = new HashMap<>();
-        int nextBitboard = selectedPieceType;
         for(Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
-            //locates the bitboard of the piece being captured if it is a capture
+            System.out.println(selectedPiece + ": " + selectedPieceType + ", " + possibleMove.getKey() + ": " + possibleMove.getValue());
             if(vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getKey(), possibleMove.getValue())) {
                 movesToRemove.put(possibleMove.getKey(), possibleMove.getValue());
             }
@@ -49,8 +48,8 @@ public class GameplayController implements MouseListener {
         System.out.println("Possible moves are: " + possibleMovesForSelectedPiece);
 
         //removes king from possible moves if in check
-        if(possibleMovesForSelectedPiece.containsKey(board.kingLocations[otherSide] + 100)) {
-            possibleMovesForSelectedPiece.remove(board.kingLocations[otherSide] + 100);
+        if(possibleMovesForSelectedPiece.containsKey(board.kingLocations[otherSide])) {
+            possibleMovesForSelectedPiece.remove(board.kingLocations[otherSide]);
             board.kingsChecked[0] = true;
         }
 
@@ -60,8 +59,8 @@ public class GameplayController implements MouseListener {
             //handles showing the possible moves
             for(Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
                 //checks for capture
-                if(possibleMove.getKey() > 100) {
-                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey()-100)].setBackground(Color.GREEN);
+                if(possibleMove.getValue() != -1) {
+                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.GREEN);
                     continue;
                 }
                 chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.RED);
@@ -76,8 +75,8 @@ public class GameplayController implements MouseListener {
             setSquareToOriginalColor(rowpass, colpass);
             for(Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
                 //checks for capture
-                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey()%100)[0],
-                        Conv.toRC120(possibleMoveToRemove.getKey()%100)[1]);
+                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
+                        Conv.toRC120(possibleMoveToRemove.getKey())[1]);
             }
             chessGUI.setPieceSelectedFalse();
             possibleMovesForSelectedPiece = null;
@@ -109,7 +108,7 @@ public class GameplayController implements MouseListener {
         //searches through all possible moves for selected piece
         for(Map.Entry<Integer, Integer> currentPossibleMove : possibleMovesForSelectedPiece.entrySet()) {
             //checks for capture
-            if(currentPossibleMove.getKey() > 100) {
+            if(currentPossibleMove.getValue() != -1) {
                 capturingMove = true;
             }
             //if the player clicks on a possible move, indicate that with the boolean
@@ -153,8 +152,8 @@ public class GameplayController implements MouseListener {
         for(Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
             //checks for capture
             //resets square of possible highlighted move
-            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey()%100)[0],
-                    Conv.toRC120(possibleMoveToRemove.getKey()%100)[1]);
+            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
+                    Conv.toRC120(possibleMoveToRemove.getKey())[1]);
         }
 
         chessGUI.JLabelCollection[Conv.to64From120(currentSquare)].setIcon(chessGUI.JLabelCollection[Conv.to64From120(selectedPiece)].getIcon());
