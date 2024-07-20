@@ -25,13 +25,13 @@ public class Board {
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "r", "n", "b", "q", "k", "b", "n", "r", "2"},
-            {"2", "p", "p", "p", "p", " ", "p", "p", "p", "2"},
+            {"2", "p", "p", "p", "p", "p", "p", "p", "p", "2"},
             {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
-            {"2", " ", " ", " ", " ", "p", " ", " ", " ", "2"},
-            {"2", " ", " ", " ", " ", " ", " ", "B", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
             {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
             {"2", "P", "P", "P", "P", "P", "P", "P", "P", "2"},
-            {"2", "R", "N", " ", "Q", "K", "B", "N", "R", "2"},
+            {"2", "R", "N", "B", "Q", "K", "B", "N", "R", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"}
     };
@@ -154,6 +154,7 @@ public class Board {
                 case 11 -> 1;
                 default -> 0;
             };
+            double negativeOrPositive = baseValue > 0 ? 1 : -1;
             //runs through each bitboard, checks if there is a piece there
             for(int j = 0; j < bitboards[i].length; j++) {
                 if(bitboards[i][j] == 1) {
@@ -161,44 +162,12 @@ public class Board {
                     double centerDistance = Math.abs(Conv.to64From120(j)%8 - 3.5);
                     double heightDistance = Math.abs(Conv.to64From120(j)/8 - 3.5);
                     totalScore += (baseValue / (centerDistance * heightDistance))/4;
+
+
                 }
             }
         }
 
-        double addOrRemove = 0;
-
-        HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
-        for(Map.Entry<Integer, Integer> move : allMovesWhite.entrySet()) {
-            double captureModifier = switch (move.getValue()) {
-                case 0 -> 5;
-                case 1, 2 -> 3;
-                case 3 -> 9;
-                case 5 -> 1;
-                default -> 0.1;
-            };
-
-            captureModifier -= getBaseValue(move.getKey(), bitboards);
-
-            addOrRemove += captureModifier * 0.5;
-        }
-
-        HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
-        for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
-            double captureModifier = -1 * switch (move.getValue()) {
-                case 6 -> 5;
-                case 7, 8 -> 3;
-                case 9 -> 9;
-                case 10 -> 10;
-                case 11 -> 1;
-                default -> 0.1;
-            };
-
-            captureModifier += getBaseValue(move.getKey(), bitboards);
-
-            addOrRemove += 0.5 * captureModifier;
-        }
-
-        totalScore += addOrRemove;
         return (double) Math.round(totalScore * 100) /100;
     }
 
