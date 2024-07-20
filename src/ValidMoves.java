@@ -82,7 +82,7 @@ public class ValidMoves {
                 }
             }
             if (Boolean.FALSE.equals(cancelOperation)) {
-                totalPossibleMoves.put(location + op, null);
+                totalPossibleMoves.put(location + op, -1);
             }
         }
         return totalPossibleMoves;
@@ -116,7 +116,7 @@ public class ValidMoves {
                 }
             }
             if (Boolean.FALSE.equals(cancelOperation)) {
-                totalPossibleMoves.put(location + op, null);
+                totalPossibleMoves.put(location + op, -1);
             }
         }
 
@@ -157,7 +157,7 @@ public class ValidMoves {
                     }
                 }
                 if(!cancelOperation) {
-                    totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], null);
+                    totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], -1);
                 } else {
                     break;
                 }
@@ -200,7 +200,7 @@ public class ValidMoves {
                     }
                 }
                 if(!cancelOperation) {
-                    totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], null);
+                    totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], -1);
                 } else {
                     break;
                 }
@@ -229,7 +229,7 @@ public class ValidMoves {
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for(int op : BLACK_PAWN_OPERATIONS) {
             if(!(bitboards[0][location + op] == 2)) {
-                totalPossibleMoves.put(op + location, null);
+                totalPossibleMoves.put(op + location, -1);
             }
         }
 
@@ -292,7 +292,7 @@ public class ValidMoves {
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for(int op : WHITE_PAWN_OPERATIONS) {
             if(!(bitboards[0][location + op] == 2)) {
-                totalPossibleMoves.put(op + location, null);
+                totalPossibleMoves.put(op + location, -1);
             }
         }
 
