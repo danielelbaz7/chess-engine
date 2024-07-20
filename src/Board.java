@@ -25,13 +25,13 @@ public class Board {
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "r", "n", "b", "q", "k", "b", "n", "r", "2"},
-            {"2", "p", "p", "p", "p", "p", "p", "p", "p", "2"},
+            {"2", "p", "p", "p", "p", " ", "p", "p", "p", "2"},
             {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
-            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
-            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", "p", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", "B", " ", "2"},
             {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
             {"2", "P", "P", "P", "P", "P", "P", "P", "P", "2"},
-            {"2", "R", "N", "B", "Q", "K", "B", "N", "R", "2"},
+            {"2", "R", "N", " ", "Q", "K", "B", "N", "R", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
             {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"}
     };
@@ -127,6 +127,7 @@ public class Board {
 
     //evaluates which side is winning and by how much
     public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn) {
+        //sets score to 1000 or -1000 if in check mate
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
         if(isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
@@ -140,12 +141,12 @@ public class Board {
                 }
             }
         }
+        //adds or removes based on distance and piece value
         for(int i = 0; i < 12; i++) {
-            double baseValue = switch (i) {
+            int baseValue = switch (i) {
                 case 0 -> -5;
                 case 1, 2 -> -3;
                 case 3 -> -9;
-                case 4, 10 -> 0;
                 case 5 -> -1;
                 case 6 -> 5;
                 case 7, 8 -> 3;
@@ -168,33 +169,60 @@ public class Board {
 
         HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
         for(Map.Entry<Integer, Integer> move : allMovesWhite.entrySet()) {
-            double captureModifier = 0.4 * switch (move.getValue()) {
+            double captureModifier = switch (move.getValue()) {
                 case 0 -> 5;
                 case 1, 2 -> 3;
                 case 3 -> 9;
                 case 5 -> 1;
-                default -> 0.125;
+                default -> 0.1;
             };
 
-            addOrRemove += captureModifier;
+            captureModifier -= getBaseValue(move.getKey(), bitboards);
+
+            addOrRemove += captureModifier * 0.5;
         }
 
         HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
         for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
-            System.out.println(move.getValue() + "POSOoSOSO");
-            double captureModifier = -0.4 * switch (move.getValue()) {
+            double captureModifier = -1 * switch (move.getValue()) {
                 case 6 -> 5;
                 case 7, 8 -> 3;
                 case 9 -> 9;
                 case 10 -> 10;
                 case 11 -> 1;
-                default -> 0.125;
+                default -> 0.1;
             };
-            addOrRemove += captureModifier;
+
+            captureModifier += getBaseValue(move.getKey(), bitboards);
+
+            addOrRemove += 0.5 * captureModifier;
         }
 
         totalScore += addOrRemove;
         return (double) Math.round(totalScore * 100) /100;
+    }
+
+    //takes a location and set of boards to find the current bitboard of a piece
+    private static int getBaseValue(int location, int[][] bitboards) {
+        int boardWithPiece = -1;
+
+        for(int i = 0; i < 12; i++) {
+            if(bitboards[i][location] == 1) {
+                boardWithPiece = i;
+            }
+        }
+
+        return switch(boardWithPiece) {
+            case 0 -> -5;
+            case 1, 2 -> -3;
+            case 3 -> -9;
+            case 5 -> -1;
+            case 6 -> 5;
+            case 7, 8 -> 3;
+            case 9 -> 9;
+            case 11 -> 1;
+            default -> 0;
+        };
     }
 
     public static String[][] getBoardTemplate()
