@@ -38,15 +38,7 @@ public class GameplayController implements MouseListener {
         int nextBitboard = selectedPieceType;
         for(Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
             //locates the bitboard of the piece being captured if it is a capture
-            if(possibleMove.getKey() > 100) {
-                for(int i = otherSide*6; i < otherSide*6 + 6; i++) {
-                    System.out.println(i);
-                    if(board.pieceBoards[i][possibleMove.getKey()-100] == 1) {
-                        nextBitboard = i;
-                    }
-                }
-            }
-            if(vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getKey()%100, nextBitboard)) {
+            if(vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getKey(), possibleMove.getValue())) {
                 movesToRemove.put(possibleMove.getKey(), possibleMove.getValue());
             }
         }

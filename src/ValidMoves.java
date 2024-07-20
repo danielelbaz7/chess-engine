@@ -74,8 +74,8 @@ public class ValidMoves {
                         cancelOperation = true;
                         break;
                     } else {
-                        //adds the possible move as a capture (+100)
-                        totalPossibleMoves.put(location + op + 100, i);
+                        //adds the possible move's value as the board of the piece it captures
+                        totalPossibleMoves.put(location + op, i);
                         cancelOperation = true;
                         break;
                     }
@@ -108,8 +108,8 @@ public class ValidMoves {
                         cancelOperation = true;
                         break;
                     } else {
-                        //adds the possible move as a capture (+100)
-                        totalPossibleMoves.put(location + op + 100, i);
+                        //adds the possible move's value as the board of the piece it captures
+                        totalPossibleMoves.put(location + op, i);
                         cancelOperation = true;
                         break;
                     }
@@ -150,7 +150,7 @@ public class ValidMoves {
                             if(k/6 == side) {
                                 break;
                             } else {
-                                totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i] + 100, k);
+                                totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], k);
                                 break;
                             }
                         }
@@ -193,7 +193,7 @@ public class ValidMoves {
                             if(k/6 == side) {
                                 break;
                             } else {
-                                totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i] + 100, k);
+                                totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], k);
                                 break;
                             }
                         }
@@ -260,7 +260,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
-                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[2] + 100, k);
+                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[2], k);
                 }
                 break;
             }
@@ -275,7 +275,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
-                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[3] + 100, l);
+                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[3], l);
                 }
                 break;
             }
@@ -291,7 +291,6 @@ public class ValidMoves {
         HashMap<Integer, Integer> totalPossibleMoves = new HashMap<Integer, Integer>();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for(int op : WHITE_PAWN_OPERATIONS) {
-            //sets a variable to -100 if the operation is a capture one
             if(!(bitboards[0][location + op] == 2)) {
                 totalPossibleMoves.put(op + location, null);
             }
@@ -324,7 +323,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
-                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[2] + 100, k);
+                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[2], k);
                 }
                 break;
             }
@@ -339,7 +338,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
-                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[3] + 100, l);
+                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[3], l);
                 }
                 break;
             }
@@ -389,18 +388,10 @@ public class ValidMoves {
                 //checks each piece to see if it removes the check
                 HashMap<Integer, Integer> possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards);
                 possibleMovesForSide.putAll(possibleMovesForPiece);
-                for(int possibleMove : possibleMovesForPiece.keySet()) {
-                    int nextBitboard = i;
-                    if(possibleMove > 100) {
-                        for(int k = 0; k < 12; k++) {
-                            if(bitboards[k][possibleMove%100] == 1) {
-                                nextBitboard = k;
-                            }
-                        }
-                    }
+                for(Map.Entry<Integer, Integer> possibleMove : possibleMovesForPiece.entrySet()) {
                     //if check is maintained then remove the move. it is impossible to make
-                    if(willThisMovePutOurKingInCheck(j, i, possibleMove%100, nextBitboard)) {
-                        possibleMovesForSide.remove(possibleMove);
+                    if(willThisMovePutOurKingInCheck(j, i, possibleMove.getKey(), possibleMove.getValue())) {
+                        possibleMovesForSide.remove(possibleMove.getKey());
                     }
                 }
 
