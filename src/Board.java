@@ -165,23 +165,31 @@ public class Board {
         }
 
         double addOrRemove = 0;
-        HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
 
+        HashMap<Integer, Integer> allMovesWhite = vm.allAvailableMoves(bitboards, 1);
         for(Map.Entry<Integer, Integer> move : allMovesWhite.entrySet()) {
-            if(move.getValue() != -1) {
-                addOrRemove += 0.35;
-                continue;
-            }
-            addOrRemove += 0.05;
+            double captureModifier = 0.4 * switch (move.getValue()) {
+                case 0 -> 5;
+                case 1, 2 -> 3;
+                case 3 -> 9;
+                case 5 -> 1;
+                default -> 0.125;
+            };
+
+            addOrRemove += captureModifier;
         }
 
         HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
         for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
-            if(move.getValue() != -1) {
-                addOrRemove -= 0.35;
-                continue;
-            }
-            addOrRemove -= 0.05;
+            double captureModifier = -0.4 * switch (move.getValue()) {
+                case 6 -> 5;
+                case 7, 8 -> 3;
+                case 9 -> 9;
+                case 10 -> 10;
+                case 11 -> 1;
+                default -> 0.125;
+            };
+            addOrRemove += captureModifier;
         }
 
         totalScore += addOrRemove;
