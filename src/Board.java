@@ -181,6 +181,7 @@ public class Board {
 
         HashMap<Integer, Integer> allMovesBlack = vm.allAvailableMoves(bitboards, 0);
         for(Map.Entry<Integer, Integer> move : allMovesBlack.entrySet()) {
+            System.out.println(move.getValue() + "POSOoSOSO");
             double captureModifier = -0.4 * switch (move.getValue()) {
                 case 6 -> 5;
                 case 7, 8 -> 3;
