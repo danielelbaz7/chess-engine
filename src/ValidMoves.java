@@ -20,9 +20,6 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
-    private static final HashSet<Integer> HORIZONTAL_ATTACKERS = new HashSet<>(Arrays.asList(0, 6, 3, 9));
-    private static final HashSet<Integer> DIAGONAL_ATTACKERS = new HashSet<>(Arrays.asList(2, 8, 3, 9));
-
     private final Board BOARD;
 
     public ValidMoves(Board b) {

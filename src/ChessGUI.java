@@ -27,35 +27,29 @@ public class ChessGUI {
     }
 
     //creates chessboard gui
-    private void initializeChessPanel()
-    {
-        System.out.println("DIMENSION " + dimension);
+    private void initializeChessPanel() {
         //makes the frame an 8x8 grid layout
         chessPanel.setLayout(new GridLayout(8, 8));
         /*iterates through each cell and sets it to either black or white,
         also chooses the proper icon based on the board template and places it on the board
          */
-        for(int i = 0; i < 64; i++)
-        {
+        for (int i = 0; i < 64; i++) {
             JLabel b = new JLabel();
             b.setOpaque(true);
             String imgSrc = "./src/Assets/";
 
-            String currentPiece = mainBoard[2+(i/8)][1+(i%8)];
+            String currentPiece = mainBoard[2 + (i / 8)][1 + (i % 8)];
 
             //sets block colors
-            if(((i/8)%2) == 0) {
-                if((i%2) == 0){
+            if (((i / 8) % 2) == 0) {
+                if ((i % 2) == 0) {
                     b.setBackground(new Color(225, 215, 183));
-                }
-                else {
+                } else {
                     b.setBackground(new Color(57, 40, 20));
                 }
-            }
-            else if((i%2) == 1) {
+            } else if ((i % 2) == 1) {
                 b.setBackground(new Color(225, 215, 183));
-            }
-            else {
+            } else {
                 b.setBackground(new Color(57, 40, 28));
             }
 
@@ -79,7 +73,7 @@ public class ChessGUI {
             //resizes image
             ImageIcon currentPieceImageIcon = new ImageIcon(imgSrc);
             Image currentPieceImage = currentPieceImageIcon.getImage();
-            Image tempImg = currentPieceImage.getScaledInstance(dimension/16, dimension/16, Image.SCALE_SMOOTH);
+            Image tempImg = currentPieceImage.getScaledInstance(dimension / 16, dimension / 16, Image.SCALE_SMOOTH);
             currentPieceImageIcon.setImage(tempImg);
 
             b.setIcon(currentPieceImageIcon);
@@ -102,7 +96,7 @@ public class ChessGUI {
         titlePanel.setLayout(new GridLayout(1, 3));
 
         JLabel titleAndCheckBox = new JLabel("Chess Engine");
-        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/50));
+        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension / 50));
         titleAndCheckBox.setForeground(Color.BLACK);
 
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
@@ -122,10 +116,9 @@ public class ChessGUI {
         showEvaluationCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     evaluationValuePanel.setVisible(true);
-                }
-                else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                     evaluationValuePanel.setVisible(false);
                 }
             }
@@ -143,26 +136,23 @@ public class ChessGUI {
         evaluationPanel.setVisible(true);
     }
 
-    public void placeBoardsAgain()
-    {
-        for(JLabel j : JLabelCollection)
-        {
+    public void placeBoardsAgain() {
+        for (JLabel j : JLabelCollection) {
             chessPanel.add(j);
         }
     }
 
     public void drawEvalBar() {
         //resets eval bar
-        for(int j = 0; j < 100; j++) {
+        for (int j = 0; j < 100; j++) {
             evaluationPanel.setForeground(Color.WHITE);
         }
-        for(int i = 0; i < Math.round(board.evaluationValue); i++) {
+        for (int i = 0; i < Math.round(board.evaluationValue); i++) {
 
         }
     }
 
-    public void startChessGUI()
-    {
+    public void startChessGUI() {
         initializeChessPanel();
         initializeTitlePanel();
         initializeEvaluationPanel();
@@ -171,12 +161,12 @@ public class ChessGUI {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setLayout(new BorderLayout());
 
-        chessPanel.setSize(dimension/2, dimension/2);
+        chessPanel.setSize(dimension / 2, dimension / 2);
         titlePanel.setPreferredSize(new Dimension((int)
-                (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()), dimension/30));
+                (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()), dimension / 30));
 
         evaluationPanel.setPreferredSize
-                (new Dimension(dimension/30, (int) ((dimension/2) + titlePanel.getPreferredSize().getHeight())));
+                (new Dimension(dimension / 30, (int) ((dimension / 2) + titlePanel.getPreferredSize().getHeight())));
 
 
         gameFrame.add(chessPanel, BorderLayout.CENTER);
@@ -184,7 +174,6 @@ public class ChessGUI {
         gameFrame.add(evaluationPanel, BorderLayout.WEST);
 
         //sets the size to accommodate the other pieces of the window
-        System.out.println(evaluationPanel.getPreferredSize().getWidth());
         gameFrame.setSize((int) (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()),
                 (int) (chessPanel.getHeight() + titlePanel.getPreferredSize().getHeight()));
         gameFrame.setVisible(true);
@@ -194,16 +183,18 @@ public class ChessGUI {
         return pieceSelectedAndCoordinate[0];
     }
 
-    public int getPointSelected()
-    {
-        if(pieceSelectedAndCoordinate[0] == 0) { return -1; }
+    public int getPointSelected() {
+        if (pieceSelectedAndCoordinate[0] == 0) {
+            return -1;
+        }
         return pieceSelectedAndCoordinate[1];
     }
 
     public void setPieceSelectedTrue(int row, int col) {
         pieceSelectedAndCoordinate[0] = 1;
-        pieceSelectedAndCoordinate[1] = ((row*8) + col);
+        pieceSelectedAndCoordinate[1] = ((row * 8) + col);
     }
+
     public void setPieceSelectedFalse() {
         pieceSelectedAndCoordinate[0] = 0;
         pieceSelectedAndCoordinate[1] = -1;
