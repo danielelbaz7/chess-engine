@@ -206,7 +206,18 @@ public class Board {
                     double heightDistance = Math.abs(Conv.to64From120(j)/8 - 3.5);
                     totalScore += (baseValue / (centerDistance * heightDistance))/4;*/
 
-
+                    if (i == 4) {
+                        totalScore += ((j / 10) - 2) * 0.50;
+                    } else if (i == 10) {
+                        totalScore += ((j / 10) - 9) * 0.50;
+                    } else {
+                        for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards).entrySet()) {
+                            //if it is not a capture and the piece we are checking is not a king
+                            if (possibleMove.getValue() == -1) {
+                                totalScore += negativeOrPositive * 0.05;
+                            }
+                        }
+                    }
                 }
             }
         }
