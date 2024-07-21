@@ -20,10 +20,13 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
-    private final Board board;
+    private static final HashSet<Integer> HORIZONTAL_ATTACKERS = new HashSet<>(Arrays.asList(0, 6, 3, 9));
+    private static final HashSet<Integer> DIAGONAL_ATTACKERS = new HashSet<>(Arrays.asList(2, 8, 3, 9));
+
+    private final Board BOARD;
 
     public ValidMoves(Board b) {
-        this.board = b;
+        this.BOARD = b;
     }
 
     public HashMap<Integer, Integer> possibleMoveFinderAllPieces(int location, int[][] bitboards) {
@@ -120,7 +123,7 @@ public class ValidMoves {
             }
         }
 
-        int otherSide = switch(side) {
+        int otherSide = switch (side) {
             case 0 -> 1;
             case 1 -> 0;
             default -> -1;
@@ -133,21 +136,20 @@ public class ValidMoves {
     private HashMap<Integer, Integer> possibleRookMoves(int location, int side, int[][] bitboards) {
         HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
         //iterates through the set of sets of rook ops
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             //iterates through each set of rook ops
-            for(int i = 0; i < ROOK_OPERATIONS[1].length; i++) {
+            for (int i = 0; i < ROOK_OPERATIONS[1].length; i++) {
                 //if out of bounds quit
                 boolean cancelOperation = false;
-                if(bitboards[0][location + ROOK_OPERATIONS[j][i]] == 2) {
+                if (bitboards[0][location + ROOK_OPERATIONS[j][i]] == 2) {
                     break;
-                }
-                else {
+                } else {
                     for (int k = 0; k < 12; k++) {
                         //if there is a piece there then check if it is the enemy, if enemy allow it if friendly do not
                         //break the rest of the loop both times
-                        if(bitboards[k][location + ROOK_OPERATIONS[j][i]] == 1){
+                        if (bitboards[k][location + ROOK_OPERATIONS[j][i]] == 1) {
                             cancelOperation = true;
-                            if(k/6 == side) {
+                            if (k / 6 == side) {
                                 break;
                             } else {
                                 totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], k);
@@ -156,7 +158,7 @@ public class ValidMoves {
                         }
                     }
                 }
-                if(!cancelOperation) {
+                if (!cancelOperation) {
                     totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], -1);
                 } else {
                     break;
@@ -164,7 +166,7 @@ public class ValidMoves {
             }
         }
 
-        int otherSide = switch(side) {
+        int otherSide = switch (side) {
             case 0 -> 1;
             case 1 -> 0;
             default -> -1;
@@ -172,25 +174,25 @@ public class ValidMoves {
 
         return totalPossibleMoves;
     }
+
     //returns a list of possible moves for a bishop
     private HashMap<Integer, Integer> possibleBishopMoves(int location, int side, int[][] bitboards) {
         HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
         //iterates through the set of sets of bishop ops
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             //iterates through each set of bishop ops
-            for(int i = 0; i < BISHOP_OPERATIONS[0].length; i++) {
+            for (int i = 0; i < BISHOP_OPERATIONS[0].length; i++) {
                 //if out of bounds quit
                 boolean cancelOperation = false;
-                if(bitboards[0][location + BISHOP_OPERATIONS[j][i]] == 2) {
+                if (bitboards[0][location + BISHOP_OPERATIONS[j][i]] == 2) {
                     break;
-                }
-                else {
+                } else {
                     for (int k = 0; k < 12; k++) {
                         //if there is a piece there then check if it is the enemy, if enemy allow it if friendly do not
                         //break the rest of the loop both times
-                        if(bitboards[k][location + BISHOP_OPERATIONS[j][i]] == 1){
+                        if (bitboards[k][location + BISHOP_OPERATIONS[j][i]] == 1) {
                             cancelOperation = true;
-                            if(k/6 == side) {
+                            if (k / 6 == side) {
                                 break;
                             } else {
                                 totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], k);
@@ -199,7 +201,7 @@ public class ValidMoves {
                         }
                     }
                 }
-                if(!cancelOperation) {
+                if (!cancelOperation) {
                     totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], -1);
                 } else {
                     break;
@@ -207,7 +209,7 @@ public class ValidMoves {
             }
         }
 
-        int otherSide = switch(side) {
+        int otherSide = switch (side) {
             case 0 -> 1;
             case 1 -> 0;
             default -> -1;
@@ -227,8 +229,8 @@ public class ValidMoves {
     private HashMap<Integer, Integer> possibleBlackPawnMoves(int location, int[][] bitboards) {
         HashMap<Integer, Integer> totalPossibleMoves = new HashMap<Integer, Integer>();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
-        for(int op : BLACK_PAWN_OPERATIONS) {
-            if(!(bitboards[0][location + op] == 2)) {
+        for (int op : BLACK_PAWN_OPERATIONS) {
+            if (!(bitboards[0][location + op] == 2)) {
                 totalPossibleMoves.put(op + location, -1);
             }
         }
@@ -242,9 +244,9 @@ public class ValidMoves {
             }
         }
 
-        if(location < 39 && location > 30) {
-            for(int j = 0; j < 12; j++) {
-                if(bitboards[j][location + BLACK_PAWN_OPERATIONS[1]] == 1) {
+        if (location < 39 && location > 30) {
+            for (int j = 0; j < 12; j++) {
+                if (bitboards[j][location + BLACK_PAWN_OPERATIONS[1]] == 1) {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[1]);
                     break;
                 }
@@ -253,10 +255,10 @@ public class ValidMoves {
             totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[1]);
         }
 
-        for(int k = 0; k < 12; k++) {
+        for (int k = 0; k < 12; k++) {
             //checks for an enemy piece
-            if(bitboards[k][location + BLACK_PAWN_OPERATIONS[2]] == 1) {
-                if((k/6) == 0) {
+            if (bitboards[k][location + BLACK_PAWN_OPERATIONS[2]] == 1) {
+                if ((k / 6) == 0) {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
@@ -264,14 +266,14 @@ public class ValidMoves {
                 }
                 break;
             }
-            if(k == 11) {
+            if (k == 11) {
                 totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
             }
         }
 
-        for(int l = 0; l < 12; l++) {
-            if(bitboards[l][location + BLACK_PAWN_OPERATIONS[3]] == 1) {
-                if((l/6) == 0) {
+        for (int l = 0; l < 12; l++) {
+            if (bitboards[l][location + BLACK_PAWN_OPERATIONS[3]] == 1) {
+                if ((l / 6) == 0) {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
@@ -279,7 +281,7 @@ public class ValidMoves {
                 }
                 break;
             }
-            if(l == 11) {
+            if (l == 11) {
                 totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
             }
         }
@@ -290,8 +292,8 @@ public class ValidMoves {
     private HashMap<Integer, Integer> possibleWhitePawnMoves(int location, int[][] bitboards) {
         HashMap<Integer, Integer> totalPossibleMoves = new HashMap<Integer, Integer>();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
-        for(int op : WHITE_PAWN_OPERATIONS) {
-            if(!(bitboards[0][location + op] == 2)) {
+        for (int op : WHITE_PAWN_OPERATIONS) {
+            if (!(bitboards[0][location + op] == 2)) {
                 totalPossibleMoves.put(op + location, -1);
             }
         }
@@ -305,9 +307,9 @@ public class ValidMoves {
             }
         }
 
-        if(location < 89 && location > 80) {
-            for(int j = 0; j < 12; j++) {
-                if(bitboards[j][location + WHITE_PAWN_OPERATIONS[1]] == 1) {
+        if (location < 89 && location > 80) {
+            for (int j = 0; j < 12; j++) {
+                if (bitboards[j][location + WHITE_PAWN_OPERATIONS[1]] == 1) {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[1]);
                     break;
                 }
@@ -316,10 +318,10 @@ public class ValidMoves {
             totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[1]);
         }
 
-        for(int k = 0; k < 12; k++) {
+        for (int k = 0; k < 12; k++) {
             //checks for an enemy piece
-            if(bitboards[k][location + WHITE_PAWN_OPERATIONS[2]] == 1) {
-                if((k/6) == 1) {
+            if (bitboards[k][location + WHITE_PAWN_OPERATIONS[2]] == 1) {
+                if ((k / 6) == 1) {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
@@ -327,14 +329,14 @@ public class ValidMoves {
                 }
                 break;
             }
-            if(k == 11) {
+            if (k == 11) {
                 totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
             }
         }
 
-        for(int l = 0; l < 12; l++) {
-            if(bitboards[l][location + WHITE_PAWN_OPERATIONS[3]] == 1) {
-                if((l/6) == 1) {
+        for (int l = 0; l < 12; l++) {
+            if (bitboards[l][location + WHITE_PAWN_OPERATIONS[3]] == 1) {
+                if ((l / 6) == 1) {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
@@ -342,7 +344,7 @@ public class ValidMoves {
                 }
                 break;
             }
-            if(l == 11) {
+            if (l == 11) {
                 totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
             }
         }
@@ -354,15 +356,17 @@ public class ValidMoves {
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
     public boolean willThisMovePutOurKingInCheck(int currentLocation, int currentBitboard, int nextLocation, int nextBitboard) {
 
-        if(nextBitboard == -1) { nextBitboard = currentBitboard; }
+        if (nextBitboard == -1) {
+            nextBitboard = currentBitboard;
+        }
 
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
-        int[] tempKingLocations = Arrays.copyOf(board.kingLocations, 2);
+        int[] tempKingLocations = Arrays.copyOf(BOARD.kingLocations, 2);
 
 
-        for(int i = 0; i < 12; i++) {
-            System.arraycopy(board.pieceBoards[i], 0, tempBitboards[i], 0, 120);
+        for (int i = 0; i < 12; i++) {
+            System.arraycopy(BOARD.pieceBoards[i], 0, tempBitboards[i], 0, 120);
         }
 
         //simulates move change
@@ -371,28 +375,28 @@ public class ValidMoves {
         tempBitboards[currentBitboard][nextLocation] = 1;
 
         //simulates king location change
-        if(currentBitboard == 4 || currentBitboard == 10) {
-            tempKingLocations[currentBitboard/6] = nextLocation;
+        if (currentBitboard == 4 || currentBitboard == 10) {
+            tempKingLocations[currentBitboard / 6] = nextLocation;
             System.out.println("The new king location is " + nextLocation);
         }
 
-        return board.isKingChecked(tempBitboards, currentBitboard/6, tempKingLocations);
+        return BOARD.isKingChecked(tempBitboards, currentBitboard / 6, tempKingLocations);
     }
 
     //finds all possible moves for a side
     public HashMap<Integer, Integer> allAvailableMoves(int[][] bitboards, int side) {
         HashMap<Integer, Integer> possibleMovesForSide = new HashMap<Integer, Integer>();
-        for(int i = side * 6; i < (side * 6) + 6; i++) {
-            for(int j = 0; j < bitboards[0].length; j++) {
-                if(bitboards[i][j] != 1) {
+        for (int i = side * 6; i < (side * 6) + 6; i++) {
+            for (int j = 0; j < bitboards[0].length; j++) {
+                if (bitboards[i][j] != 1) {
                     continue;
                 }
                 //checks each piece to see if it removes the check
                 HashMap<Integer, Integer> possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards);
                 possibleMovesForSide.putAll(possibleMovesForPiece);
-                for(Map.Entry<Integer, Integer> possibleMove : possibleMovesForPiece.entrySet()) {
+                for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForPiece.entrySet()) {
                     //if check is maintained then remove the move. it is impossible to make
-                    if(willThisMovePutOurKingInCheck(j, i, possibleMove.getKey(), possibleMove.getValue())) {
+                    if (willThisMovePutOurKingInCheck(j, i, possibleMove.getKey(), possibleMove.getValue())) {
                         possibleMovesForSide.remove(possibleMove.getKey());
                     }
                 }
