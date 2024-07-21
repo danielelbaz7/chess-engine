@@ -133,6 +133,7 @@ public class Board {
             }
             System.out.print(pieceBoards[5][i]);
         }
+        System.out.println();
     }
 
     //gui usage
@@ -202,9 +203,11 @@ public class Board {
                 if (bitboards[i][j] == 1) {
                     //if there is a piece there, find the value and find its distance from the center and multiply that by the base value
 
-                    /*double centerDistance = Math.abs(Conv.to64From120(j)%8 - 3.5);
-                    double heightDistance = Math.abs(Conv.to64From120(j)/8 - 3.5);
-                    totalScore += (baseValue / (centerDistance * heightDistance))/4;*/
+                    /*double centerDistance = Math.abs(Conv.to64From120(j) % 8 - 3.5);
+                    double heightDistance = Math.abs(Conv.to64From120(j) / 8 - 3.5);
+                    totalScore += (baseValue / (centerDistance * heightDistance)) / 4;*/
+
+                    totalScore += baseValue;
 
                     if (i == 4) {
                         totalScore += ((j / 10) - 2) * 0.50;
@@ -216,8 +219,13 @@ public class Board {
                             if (possibleMove.getValue() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
-                                if(i == 0 || i == 6) {
-                                    if(possibleMove.getValue() == 0 || possibleMove.getValue() == 6 || possibleMove.getValue() == )
+                                //if the other piece can attack our tested piece, add to the total score the basevalue
+                                // of our piece minus the basevalue of the other piece to determine the value of the attack
+                                if (vm.possibleMoveFinderAllPieces(possibleMove.getKey(), bitboards).containsKey(j)) {
+                                    System.out.println(possibleMove.getKey() + "IS THE PIECE WE ARE ATTACKING");
+                                    totalScore += (baseValue - getBaseValue(possibleMove.getValue(), bitboards)) * -1;
+                                } else {
+                                    totalScore += (getBaseValue(possibleMove.getKey(), bitboards) * -1);
                                 }
                             }
                         }
@@ -226,7 +234,7 @@ public class Board {
             }
         }
 
-        return (double) Math.round(totalScore * 100) / 100;
+        return (double) Math.round(totalScore * 10) / 10;
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
