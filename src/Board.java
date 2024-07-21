@@ -212,9 +212,13 @@ public class Board {
                         totalScore += ((j / 10) - 9) * 0.50;
                     } else {
                         for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards).entrySet()) {
-                            //if it is not a capture and the piece we are checking is not a king
+                            //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getValue() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
+                            } else {
+                                if(i == 0 || i == 6) {
+                                    if(possibleMove.getValue() == 0 || possibleMove.getValue() == 6 || possibleMove.getValue() == )
+                                }
                             }
                         }
                     }
