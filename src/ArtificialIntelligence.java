@@ -1,7 +1,4 @@
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-
 public class ArtificialIntelligence {
 
     Board board;
@@ -22,10 +19,17 @@ public class ArtificialIntelligence {
     }
 
     //locates best move based on tree of moves
-    public Move findBestMove(Board board, int depth, boolean ourTurn) {
+    public double findBestMove(Board board) {
         int side = board.whiteTurn ? 1 : 0;
 
-        if(depth == 0 || Board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
+        /*if(depth == 0 || Board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
+            return Board.evaluateBoard(tempBitboards, whiteTurn, tempKingLocations);
+        }*/
+        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves()
+        Move bestMove = ;
+
+        if(whiteTurn) {
+            double maxEval = Integer.MIN_VALUE;
 
         }
 

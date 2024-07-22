@@ -237,12 +237,22 @@ public class Board {
         return (double) Math.round(totalScore * 10) / 10;
     }
 
+    //performs a move
     public int[][] doMove(int[][] bitboards, Move move) {
         bitboards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
         if(move.getNextBitboard() != -1) {
             bitboards[move.getNextBitboard()][move.getMoveLocation()] = 0;
         }
         bitboards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
+
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getMoveLocation();
+        }
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getMoveLocation();
+        }
+
         return bitboards;
     }
 
