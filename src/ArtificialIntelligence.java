@@ -25,7 +25,7 @@ public class ArtificialIntelligence {
     public Move findBestMove(Board board, int depth, boolean ourTurn) {
         int side = board.whiteTurn ? 1 : 0;
 
-        if(depth == 0 || board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
+        if(depth == 0 || Board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
 
         }
 
