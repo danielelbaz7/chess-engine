@@ -103,10 +103,13 @@ public class ChessGUI {
         authorText.setForeground(Color.BLUE);
 
         JCheckBox showEvaluationCheckBox = getEvaluationCheckBox();
+        JCheckBox artificialIntelligenceAssistantCheckBox = new JCheckBox("Show best move using AI?");
+
 
         titlePanel.add(titleAndCheckBox);
         titlePanel.add(authorText);
         titlePanel.add(showEvaluationCheckBox);
+        titlePanel.add(artificialIntelligenceAssistantCheckBox);
         titlePanel.setVisible(true);
 
     }

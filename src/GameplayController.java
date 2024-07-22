@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class GameplayController implements MouseListener {
