@@ -34,7 +34,7 @@ public class Board {
 
     public Board() {
         this.generateBoards();
-        evaluationValue = evaluateBoard(pieceBoards, whiteTurn);
+        evaluationValue = evaluateBoard(pieceBoards, whiteTurn, kingLocations);
     }
 
     //initializes the bitboards
@@ -164,12 +164,16 @@ public class Board {
         return totalPossibleMoves.containsMove(kingLocations[side]);
     }
 
+    public boolean isKingCheckmated(int[][] bitboards, int side, int[] kingLocations) {
+        return isKingChecked(bitboards, side, kingLocations) && vm.allAvailableMoves(bitboards, side).isEmpty();
+    }
+
     //evaluates which side is winning and by how much
-    public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn) {
+    public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn, int[] kingLocations) {
         //sets score to 1000 or -1000 if in check mate
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
-        if (isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
+        if (isKingChecked(bitboards, sideToCheck, kingLocations)) {
             if (vm.allAvailableMoves(pieceBoards, sideToCheck).isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;
@@ -231,6 +235,15 @@ public class Board {
         }
 
         return (double) Math.round(totalScore * 10) / 10;
+    }
+
+    public int[][] doMove(int[][] bitboards, Move move) {
+        bitboards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
+        if(move.getNextBitboard() != -1) {
+            bitboards[move.getNextBitboard()][move.getMoveLocation()] = 0;
+        }
+        bitboards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
+        return bitboards;
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
