@@ -26,14 +26,8 @@ public class ValidMoves {
         this.BOARD = b;
     }
 
-    public HashMap<Integer, Integer> possibleMoveFinderAllPieces(int location, int[][] bitboards) {
+    public HashMap<Integer, Integer> possibleMoveFinderAllPieces(int location, int[][] bitboards, int pieceType) {
         HashMap<Integer, Integer> possibleMoves = new HashMap<>();
-        int pieceType = -1;
-        for (int i = 0; i < 12; i++) {
-            if (bitboards[i][location] == 1) {
-                pieceType = i;
-            }
-        }
         //checks what piecetype to determine what moves to find
         possibleMoves = switch (pieceType) {
             case 0 -> possibleRookMoves(location, 0, bitboards);
@@ -389,7 +383,7 @@ public class ValidMoves {
                     continue;
                 }
                 //checks each piece to see if it removes the check
-                HashMap<Integer, Integer> possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards);
+                HashMap<Integer, Integer> possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards, i);
                 possibleMovesForSide.putAll(possibleMovesForPiece);
                 for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForPiece.entrySet()) {
                     //if check is maintained then remove the move. it is impossible to make

@@ -22,7 +22,13 @@ public class GameplayController implements MouseListener {
     //makes the selected square gray and the possible moves red
     private void setPieceSelectedGUI(int rowpass, int colpass) {
         selectedPiece = (Conv.to120RC(rowpass, colpass));
-        possibleMovesForSelectedPiece = vm.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards);
+        int pieceType = -1;
+        for (int i = 0; i < 12; i++) {
+            if (board.pieceBoards[i][selectedPiece] == 1) {
+                pieceType = i;
+            }
+        }
+        possibleMovesForSelectedPiece = vm.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards, pieceType);
         //sets the current piece type
         for (int i = 0; i < 12; i++) {
             if (board.pieceBoards[i][Conv.to120RC(rowpass, colpass)] == 1) {

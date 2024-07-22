@@ -161,7 +161,7 @@ public class Board {
         for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
                 if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.putAll(vm.possibleMoveFinderAllPieces(j, bitboards));
+                    totalPossibleMoves.putAll(vm.possibleMoveFinderAllPieces(j, bitboards, i));
                 }
             }
         }
@@ -214,14 +214,14 @@ public class Board {
                     } else if (i == 10) {
                         totalScore += ((j / 10) - 9) * 0.50;
                     } else {
-                        for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards).entrySet()) {
+                        for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards, i).entrySet()) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getValue() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (vm.possibleMoveFinderAllPieces(possibleMove.getKey(), bitboards).containsKey(j)) {
+                                if (vm.possibleMoveFinderAllPieces(possibleMove.getKey(), bitboards, i).containsKey(j)) {
                                     System.out.println(possibleMove.getKey() + "IS THE PIECE WE ARE ATTACKING");
                                     totalScore += (baseValue - getBaseValue(possibleMove.getValue(), bitboards)) * -1;
                                 } else {
