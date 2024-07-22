@@ -1,7 +1,3 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 public class Board {
 
     //declares white pieces
@@ -156,16 +152,16 @@ public class Board {
 
     public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
         int otherSide = side == 1 ? 0 : 1;
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
+        MoveSet totalPossibleMoves = new MoveSet();
         //looks through enemy pieces and finds their possible moves
         for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
                 if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.putAll(vm.possibleMoveFinderAllPieces(j, bitboards, i));
+                    totalPossibleMoves.addAll(vm.possibleMoveFinderAllPieces(j, bitboards, i));
                 }
             }
         }
-        return totalPossibleMoves.containsKey(kingLocations[side]);
+        return totalPossibleMoves.containsMove(kingLocations[side]);
     }
 
     //evaluates which side is winning and by how much
@@ -214,18 +210,18 @@ public class Board {
                     } else if (i == 10) {
                         totalScore += ((j / 10) - 9) * 0.50;
                     } else {
-                        for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards, i).entrySet()) {
+                        for (Move possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
-                            if (possibleMove.getValue() == -1) {
+                            if (possibleMove.getNextBitboard() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (vm.possibleMoveFinderAllPieces(possibleMove.getKey(), bitboards, i).containsKey(j)) {
-                                    System.out.println(possibleMove.getKey() + "IS THE PIECE WE ARE ATTACKING");
-                                    totalScore += (baseValue - getBaseValue(possibleMove.getValue(), bitboards)) * -1;
+                                if (vm.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
+                                    System.out.println(possibleMove.getMoveLocation() + "IS THE PIECE WE ARE ATTACKING");
+                                    totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
                                 } else {
-                                    totalScore += (getBaseValue(possibleMove.getKey(), bitboards) * -1);
+                                    totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
                                 }
                             }
                         }

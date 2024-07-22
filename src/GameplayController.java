@@ -7,7 +7,7 @@ import java.util.Map;
 public class GameplayController implements MouseListener {
 
     int selectedPiece = -1;
-    HashMap<Integer, Integer> possibleMovesForSelectedPiece = null;
+    MoveSet possibleMovesForSelectedPiece = null;
     int selectedPieceType = -1;
     Board board;
     ValidMoves vm;
@@ -37,21 +37,20 @@ public class GameplayController implements MouseListener {
         }
         int otherSide = selectedPieceType > 5 ? 0 : 1;
 
-        //iterates through all possible moves and put moves that check into a hashset to avoid concurrent modification exception
-        HashMap<Integer, Integer> movesToRemove = new HashMap<>();
-        for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
-            System.out.println(selectedPiece + ": " + selectedPieceType + ", " + possibleMove.getKey() + ": " + possibleMove.getValue());
-            if (vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getKey(), possibleMove.getValue())) {
-                movesToRemove.put(possibleMove.getKey(), possibleMove.getValue());
+        //iterates through all possible moves and put moves that check into a hashmap to avoid concurrent modification exception
+        MoveSet movesToRemove = new MoveSet();
+        for (Move possibleMove : possibleMovesForSelectedPiece) {
+            if (vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard())) {
+                movesToRemove.add(new Move(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
             }
         }
 
-        for (Map.Entry<Integer, Integer> moveToRemove : movesToRemove.entrySet()) {
-            possibleMovesForSelectedPiece.remove(moveToRemove.getKey());
+        for (Move moveToRemove : movesToRemove) {
+            possibleMovesForSelectedPiece.remove(moveToRemove.getMoveLocation());
         }
 
         //removes king from possible moves if in check
-        if (possibleMovesForSelectedPiece.containsKey(board.kingLocations[otherSide])) {
+        if (possibleMovesForSelectedPiece.containsMove(board.kingLocations[otherSide])) {
             possibleMovesForSelectedPiece.remove(board.kingLocations[otherSide]);
             board.kingsChecked[0] = true;
         }
@@ -60,13 +59,13 @@ public class GameplayController implements MouseListener {
             chessGUI.JLabelCollection[(rowpass * 8) + colpass].setBackground(Color.DARK_GRAY);
             chessGUI.setPieceSelectedTrue(rowpass, colpass);
             //handles showing the possible moves
-            for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
+            for (Move possibleMove : possibleMovesForSelectedPiece) {
                 //checks for capture
-                if (possibleMove.getValue() != -1) {
-                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.GREEN);
+                if (possibleMove.getNextBitboard() != -1) {
+                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getMoveLocation())].setBackground(Color.GREEN);
                     continue;
                 }
-                chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.RED);
+                chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getMoveLocation())].setBackground(Color.RED);
             }
         }
 
@@ -75,10 +74,10 @@ public class GameplayController implements MouseListener {
             selectedPiece = -1;
             selectedPieceType = -1;
             setSquareToOriginalColor(rowpass, colpass);
-            for (Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
+            for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
                 //checks for capture
-                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
-                        Conv.toRC120(possibleMoveToRemove.getKey())[1]);
+                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
+                        Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
             }
             chessGUI.setPieceSelectedFalse();
             possibleMovesForSelectedPiece = null;
@@ -110,13 +109,13 @@ public class GameplayController implements MouseListener {
             return bitboards;
         }
         //searches through all possible moves for selected piece
-        for (Map.Entry<Integer, Integer> currentPossibleMove : possibleMovesForSelectedPiece.entrySet()) {
+        for (Move currentPossibleMove : possibleMovesForSelectedPiece) {
             //checks for capture
-            if (currentPossibleMove.getValue() != -1) {
+            if (currentPossibleMove.getNextBitboard() != -1) {
                 capturingMove = true;
             }
             //if the player clicks on a possible move, indicate that with the boolean
-            if (currentPossibleMove.getKey() == currentSquare) {
+            if (currentPossibleMove.getMoveLocation() == currentSquare) {
                 onPossibleSquare = true;
                 break;
             }
@@ -154,11 +153,11 @@ public class GameplayController implements MouseListener {
         bitboards[selectedPieceType][selectedPiece] = 0;
 
         setSquareToOriginalColor(Conv.toRC120(selectedPiece)[0], Conv.toRC120(selectedPiece)[1]);
-        for (Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
+        for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
             //checks for capture
             //resets square of possible highlighted move
-            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
-                    Conv.toRC120(possibleMoveToRemove.getKey())[1]);
+            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
+                    Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
         }
 
         chessGUI.JLabelCollection[Conv.to64From120(currentSquare)].setIcon(chessGUI.JLabelCollection[Conv.to64From120(selectedPiece)].getIcon());

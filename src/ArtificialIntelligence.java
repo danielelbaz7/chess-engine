@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Map;
 
 public class ArtificialIntelligence {
