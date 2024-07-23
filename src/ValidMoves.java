@@ -376,7 +376,6 @@ public class ValidMoves {
         //simulates king location change
         if (currentBitboard == 4 || currentBitboard == 10) {
             tempKingLocations[currentBitboard / 6] = nextLocation;
-            System.out.println("The new king location is " + nextLocation);
         }
 
         return BoardMethods.isKingChecked(tempBitboards, tempKingLocations, currentBitboard / 6);
