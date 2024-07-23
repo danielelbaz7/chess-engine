@@ -133,7 +133,44 @@ public class Board {
 
 
 
-    public static String[][] getBoardTemplate() {
+    //performs a move
+    public int[][] makeMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
+        if(move.getNextBitboard() != -1) {
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 0;
+        }
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
+
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getMoveLocation();
+        }
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getMoveLocation();
+        }
+
+        return pieceBoards;
+    }
+
+    public int[][] undoMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 1;
+        if(move.getNextBitboard() != -1) {
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 1;
+        }
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 0;
+
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getCurrentLocation();
+        }
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getCurrentLocation();
+        }
+
+        return pieceBoards;
+    }
+
+    public String[][] getBoardTemplate() {
         return boardTemplate;
     }
 
