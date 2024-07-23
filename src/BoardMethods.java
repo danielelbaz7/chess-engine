@@ -30,6 +30,10 @@ public class BoardMethods {
         return totalPossibleMoves.containsMove(kingLocations[side]);
     }
 
+    public static boolean isKingCheckmated(int[][] bitboards, int[] kingLocations, int side) {
+        return isKingChecked(bitboards, kingLocations, side) && ValidMoves.allAvailableMoves(bitboards, kingLocations, side).isEmpty();
+    }
+
     //evaluates which side is winning and by how much
     public static double evaluateBoard(int[][] bitboards, int[] kingLocations, boolean isWhiteTurn) {
         //sets score to 1000 or -1000 if in check mate
