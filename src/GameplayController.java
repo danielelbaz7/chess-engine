@@ -182,7 +182,7 @@ public class GameplayController implements MouseListener {
             //controls checks
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
-            board.evaluationValue = board.evaluateBoard(board.pieceBoards, board.whiteTurn);
+            board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
             if (Math.abs(board.evaluationValue) != 1000) {
                 chessGUI.evaluationValuePanel.setText(String.valueOf(board.evaluationValue));
             } else {
