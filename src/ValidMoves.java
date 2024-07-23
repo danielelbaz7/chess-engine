@@ -215,8 +215,14 @@ public class ValidMoves {
 
     //returns a list of possible queen moves
     private MoveSet possibleQueenMoves(int location, int side, int[][] bitboards) {
-        MoveSet totalPossibleMoves = new MoveSet(possibleRookMoves(location, side, bitboards));
-        totalPossibleMoves.addAll(possibleBishopMoves(location, side, bitboards));
+        int currentBitboard = side == 1 ? 9 : 3;
+        MoveSet totalPossibleMoves = new MoveSet();
+        for(Move possibleMove : possibleRookMoves(location, side, bitboards)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
+        for(Move possibleMove : possibleBishopMoves(location, side, bitboards)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
         return totalPossibleMoves;
     }
 
