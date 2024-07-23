@@ -51,7 +51,7 @@ public class ValidMoves {
     //returns list of possible moves for a king
     private MoveSet possibleKingMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 4 ? 0 : 1;
+        int currentBitboard = side == 0 ? 4 : 10;
         //runs through each possible operation and checks for validity
         for (int op : KING_OPERATIONS) {
             boolean cancelOperation = false;
@@ -86,7 +86,7 @@ public class ValidMoves {
     //returns a list of possible knight moves
     private MoveSet possibleKnightMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 1 ? 0 : 1;
+        int currentBitboard = side == 0 ? 1 : 7;
         //runs through each possible operation and checks for validity
         for (int op : KNIGHT_OPERATIONS) {
             boolean cancelOperation = false;
@@ -128,7 +128,7 @@ public class ValidMoves {
     //returns a list of possible moves for a rook
     private MoveSet possibleRookMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 0 ? 0 : 1;
+        int currentBitboard = side == 0 ? 0 : 6;
         //iterates through the set of sets of rook ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of rook ops
@@ -172,7 +172,7 @@ public class ValidMoves {
     //returns a list of possible moves for a bishop
     private MoveSet possibleBishopMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 2 ? 0 : 1;
+        int currentBitboard = side == 0 ? 2 : 8;
         //iterates through the set of sets of bishop ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of bishop ops
