@@ -40,7 +40,7 @@ public class GameplayController implements MouseListener {
         //iterates through all possible moves and put moves that check into a hashmap to avoid concurrent modification exception
         MoveSet movesToRemove = new MoveSet();
         for (Move possibleMove : possibleMovesForSelectedPiece) {
-            if (vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard())) {
+            if (vm.willThisMovePutOurKingInCheck(possibleMove)) {
                 movesToRemove.add(new Move(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
             }
         }

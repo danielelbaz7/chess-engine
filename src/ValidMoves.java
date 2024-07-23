@@ -355,7 +355,12 @@ public class ValidMoves {
 
     //returns if the move will put the king in check
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
-    public boolean willThisMovePutOurKingInCheck(int currentLocation, int currentBitboard, int nextLocation, int nextBitboard) {
+    public boolean willThisMovePutOurKingInCheck(Move move) {
+
+        int currentLocation = move.getCurrentLocation();
+        int currentBitboard = move.getCurrentBitboard();
+        int nextLocation = move.getMoveLocation();
+        int nextBitboard = move.getNextBitboard();
 
         if (nextBitboard == -1) {
             nextBitboard = currentBitboard;
@@ -397,7 +402,7 @@ public class ValidMoves {
                 possibleMovesForSide.addAll(possibleMovesForPiece);
                 for (Move possibleMove : possibleMovesForPiece) {
                     //if check is maintained then remove the move. it is impossible to make
-                    if (willThisMovePutOurKingInCheck(j, i, possibleMove.getMoveLocation(), possibleMove.getNextBitboard())) {
+                    if (willThisMovePutOurKingInCheck(possibleMove)) {
                         possibleMovesForSide.remove(possibleMove.getMoveLocation());
                     }
                 }
