@@ -11,21 +11,27 @@ public class Board {
 
     //determines side to move
     double evaluationValue = 0;
-    boolean whiteTurn = false;
+    boolean whiteTurn = true;
     boolean[] kingsChecked = {false, false};
     int[] kingLocations = {-1, -1};
     final ValidMoves vm = new ValidMoves(this);
-
-    private final String[][] boardTemplate;
+    private String[][] boardTemp;
 
     public Board(String[][] boardTemplate) {
-        this.boardTemplate = boardTemplate;
-        this.generateBoards();
+        boardTemp = boardTemplate;
+        this.generateBoards(boardTemplate);
+        evaluationValue = BoardMethods.evaluateBoard(this);
+    }
+
+    //constructor for making it based off of a 2d array rather than a string template
+    public Board(int[][] bitboards, int[] kingLocations) {
+        this.pieceBoards = bitboards;
+        this.kingLocations = kingLocations;
         evaluationValue = BoardMethods.evaluateBoard(this);
     }
 
     //initializes the bitboards
-    private void createBitboards(int[][] bitboards) {
+    private void createBitboards(String[][] boardTemplate) {
         //runs the creator for each individual board
         for (int i = 0; i < 12; i++) {
             //logs the current board
@@ -103,13 +109,13 @@ public class Board {
             for (int k = 0; k < 120; k++) {
                 currentBoard[k] = Integer.parseInt(baseLong.substring(k, k + 1));
             }
-            bitboards[i] = currentBoard;
+            pieceBoards[i] = currentBoard;
         }
     }
 
     //sets the boardlist to the newly generated boards and prints the board to the console
-    public void generateBoards() {
-        createBitboards(pieceBoards);
+    public void generateBoards(String[][] boardTemplate) {
+        createBitboards(boardTemplate);
         for (int i = 0; i < 120; i++) {
             if (i % 10 == 0) {
                 System.out.println();
@@ -139,7 +145,7 @@ public class Board {
     }
 
     public String[][] getBoardTemplate() {
-        return boardTemplate;
+        return boardTemp;
     }
 
 }

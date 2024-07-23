@@ -86,7 +86,7 @@ public class ValidMoves {
     //returns a list of possible knight moves
     private static MoveSet possibleKnightMoves(int location, int side, Board b) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 1 ? 0 : 1;
+        int currentBitboard = side == 0 ? 1 : 7;
         //runs through each possible operation and checks for validity
         for (int op : KNIGHT_OPERATIONS) {
             boolean cancelOperation = false;
@@ -128,7 +128,7 @@ public class ValidMoves {
     //returns a list of possible moves for a rook
     private static MoveSet possibleRookMoves(int location, int side, Board b) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 0 ? 0 : 1;
+        int currentBitboard = side == 0 ? 0 : 6;
         //iterates through the set of sets of rook ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of rook ops
@@ -172,7 +172,7 @@ public class ValidMoves {
     //returns a list of possible moves for a bishop
     private static MoveSet possibleBishopMoves(int location, int side, Board b) {
         MoveSet totalPossibleMoves = new MoveSet();
-        int currentBitboard = side == 2 ? 0 : 1;
+        int currentBitboard = side == 0 ? 2 : 8;
         //iterates through the set of sets of bishop ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of bishop ops
@@ -215,8 +215,14 @@ public class ValidMoves {
 
     //returns a list of possible queen moves
     private static MoveSet possibleQueenMoves(int location, int side, Board b) {
-        MoveSet totalPossibleMoves = new MoveSet(possibleRookMoves(location, side, b));
-        totalPossibleMoves.addAll(possibleBishopMoves(location, side, b));
+        int currentBitboard = side == 1 ? 9 : 3;
+        MoveSet totalPossibleMoves = new MoveSet();
+        for(Move possibleMove : possibleRookMoves(location, side, b)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
+        for(Move possibleMove : possibleBishopMoves(location, side, b)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
         return totalPossibleMoves;
     }
 
@@ -355,9 +361,6 @@ public class ValidMoves {
         int nextLocation = move.getMoveLocation();
         int nextBitboard = move.getNextBitboard();
 
-        if (nextBitboard == -1) {
-            nextBitboard = currentBitboard;
-        }
 
         //creates temporary b.pieceBoards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
@@ -370,7 +373,9 @@ public class ValidMoves {
 
         //simulates move change
         tempBitboards[currentBitboard][currentLocation] = 0;
-        tempBitboards[nextBitboard][nextLocation] = 0;
+        if (nextBitboard != -1) {
+            tempBitboards[nextBitboard][nextLocation] = 0;
+        }
         tempBitboards[currentBitboard][nextLocation] = 1;
 
         //simulates king location change
@@ -378,7 +383,7 @@ public class ValidMoves {
             tempKingLocations[currentBitboard / 6] = nextLocation;
         }
 
-        return BoardMethods.isKingChecked(b, move.getCurrentBitboard()/6);
+        return BoardMethods.isKingChecked(new Board(tempBitboards, tempKingLocations), move.getCurrentBitboard()/6);
     }
 
     //finds all possible moves for a side

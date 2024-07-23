@@ -17,7 +17,7 @@ public class BoardMethods {
     }
 
     public static boolean isKingChecked(Board b, int side) {
-        int otherSide = b.whiteTurn ? 0 : 1;
+        int otherSide = side == 1 ? 0 : 1;
         MoveSet totalPossibleMoves = new MoveSet();
         //looks through enemy pieces and finds their possible moves
         for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
