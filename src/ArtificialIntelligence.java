@@ -4,16 +4,19 @@ import java.util.Map;
 public class ArtificialIntelligence {
 
     //locates best move based on tree of moves
-    public Map.Entry<Integer, Integer> findBestMove(Board board, int depth, boolean ourTurn) {
-        int side = board.whiteTurn ? 1 : 0;
+    public double findBestMove(Board b, int depth, boolean ourTurn) {
 
-        for (int i = side * 6; i < (side * 6) + 6; i++) {
-            for (int j = 0; j < board.pieceBoards[0].length; j++) {
-                if (board.pieceBoards[i][j] == 1) {
+        if(depth == 0 || BoardMethods.isKingCheckmated(b.pieceBoards, b.kingLocations, 0) || BoardMethods.isKingCheckmated(b.pieceBoards, b.kingLocations, 1)) {
+            return BoardMethods.evaluateBoard(b.pieceBoards, b.kingLocations, true);
+        }
 
-                }
+        if(ourTurn) {
+            int maxEval = Integer.MIN_VALUE;
+            for(Move move : ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 1)) {
+                
             }
         }
+
         return null;
     }
 
