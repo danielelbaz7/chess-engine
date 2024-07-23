@@ -131,20 +131,7 @@ public class Board {
         System.out.println();
     }
 
-    //gui usage
-    public boolean isThereAPieceThere(int rowpass, int colpass) {
-        int startingIndex = 0;
-        if (Boolean.TRUE.equals(whiteTurn)) {
-            startingIndex = 6;
-        }
-        int pieceIndex = (((rowpass * 8) + 20) + (colpass + 1)) + (rowpass * 2);
-        for (int i = startingIndex; i < startingIndex + 6; i++) {
-            if (pieceBoards[i][pieceIndex] == 1) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     //moved to board as it made more sense, checks the current board value
     //no longer static to remove static global state
