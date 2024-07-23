@@ -14,7 +14,6 @@ public class Board {
     boolean whiteTurn = true;
     boolean[] kingsChecked = {false, false};
     int[] kingLocations = {-1, -1};
-    final ValidMoves vm = new ValidMoves(this);
 
     //creates a default board template used to generate the bitboards
     private static final String[][] boardTemplate = {
@@ -150,14 +149,14 @@ public class Board {
     //moved to board as it made more sense, checks the current board value
     //no longer static to remove static global state
 
-    public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
+    public static boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
         int otherSide = side == 1 ? 0 : 1;
         MoveSet totalPossibleMoves = new MoveSet();
         //looks through enemy pieces and finds their possible moves
         for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
                 if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.addAll(vm.possibleMoveFinderAllPieces(j, bitboards, i));
+                    totalPossibleMoves.addAll(ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i));
                 }
             }
         }
@@ -170,7 +169,7 @@ public class Board {
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
         if (isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
-            if (vm.allAvailableMoves(pieceBoards, sideToCheck).isEmpty()) {
+            if (ValidMoves.allAvailableMoves(pieceBoards, kingLocations, sideToCheck).isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;
                     return totalScore;
@@ -210,14 +209,14 @@ public class Board {
                     } else if (i == 10) {
                         totalScore += ((j / 10) - 9) * 0.50;
                     } else {
-                        for (Move possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards, i)) {
+                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getNextBitboard() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (vm.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
+                                if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
                                     System.out.println(possibleMove.getMoveLocation() + "IS THE PIECE WE ARE ATTACKING");
                                     totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
                                 } else {

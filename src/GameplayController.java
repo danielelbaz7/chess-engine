@@ -16,7 +16,6 @@ public class GameplayController implements MouseListener {
     public GameplayController(ChessGUI c) {
         this.chessGUI = c;
         board = chessGUI.board;
-        vm = new ValidMoves(board);
     }
 
     //makes the selected square gray and the possible moves red
@@ -28,7 +27,7 @@ public class GameplayController implements MouseListener {
                 pieceType = i;
             }
         }
-        possibleMovesForSelectedPiece = vm.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards, pieceType);
+        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards, pieceType);
         //sets the current piece type
         for (int i = 0; i < 12; i++) {
             if (board.pieceBoards[i][Conv.to120RC(rowpass, colpass)] == 1) {
@@ -40,7 +39,7 @@ public class GameplayController implements MouseListener {
         //iterates through all possible moves and put moves that check into a hashmap to avoid concurrent modification exception
         MoveSet movesToRemove = new MoveSet();
         for (Move possibleMove : possibleMovesForSelectedPiece) {
-            if (vm.willThisMovePutOurKingInCheck(possibleMove)) {
+            if (ValidMoves.willThisMovePutOurKingInCheck(board.pieceBoards, board.kingLocations, possibleMove)) {
                 movesToRemove.add(new Move(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
             }
         }
@@ -198,10 +197,10 @@ public class GameplayController implements MouseListener {
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if (board.kingsChecked[otherSide]) {
                 board.kingsChecked[otherSide] = false;
-            } else if (board.isKingChecked(board.pieceBoards, sideToCheck, board.kingLocations)) {
+            } else if (Board.isKingChecked(board.pieceBoards, sideToCheck, board.kingLocations)) {
                 board.kingsChecked[sideToCheck] = true;
                 //game over is printed outside the method as isCheckMated is used in simulation as well
-                if (vm.allAvailableMoves(board.pieceBoards, sideToCheck).isEmpty()) {
+                if (ValidMoves.allAvailableMoves(board.pieceBoards, board.kingLocations, sideToCheck).isEmpty()) {
                     System.out.println("GAME OVER");
                 }
             }

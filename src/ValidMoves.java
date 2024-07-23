@@ -20,13 +20,7 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
-    private final Board BOARD;
-
-    public ValidMoves(Board b) {
-        this.BOARD = b;
-    }
-
-    public MoveSet possibleMoveFinderAllPieces(int location, int[][] bitboards, int pieceType) {
+    public static MoveSet possibleMoveFinderAllPieces(int location, int[][] bitboards, int pieceType) {
         MoveSet possibleMoves = new MoveSet();
         //checks what piecetype to determine what moves to find
         possibleMoves = switch (pieceType) {
@@ -49,7 +43,7 @@ public class ValidMoves {
     }
 
     //returns list of possible moves for a king
-    private MoveSet possibleKingMoves(int location, int side, int[][] bitboards) {
+    private static MoveSet possibleKingMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         int currentBitboard = side == 0 ? 4 : 10;
         //runs through each possible operation and checks for validity
@@ -84,7 +78,7 @@ public class ValidMoves {
     }
 
     //returns a list of possible knight moves
-    private MoveSet possibleKnightMoves(int location, int side, int[][] bitboards) {
+    private static MoveSet possibleKnightMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         int currentBitboard = side == 0 ? 1 : 7;
         //runs through each possible operation and checks for validity
@@ -126,7 +120,7 @@ public class ValidMoves {
     }
 
     //returns a list of possible moves for a rook
-    private MoveSet possibleRookMoves(int location, int side, int[][] bitboards) {
+    private static MoveSet possibleRookMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         int currentBitboard = side == 0 ? 0 : 6;
         //iterates through the set of sets of rook ops
@@ -170,7 +164,7 @@ public class ValidMoves {
     }
 
     //returns a list of possible moves for a bishop
-    private MoveSet possibleBishopMoves(int location, int side, int[][] bitboards) {
+    private static MoveSet possibleBishopMoves(int location, int side, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         int currentBitboard = side == 0 ? 2 : 8;
         //iterates through the set of sets of bishop ops
@@ -214,7 +208,7 @@ public class ValidMoves {
     }
 
     //returns a list of possible queen moves
-    private MoveSet possibleQueenMoves(int location, int side, int[][] bitboards) {
+    private static MoveSet possibleQueenMoves(int location, int side, int[][] bitboards) {
         int currentBitboard = side == 1 ? 9 : 3;
         MoveSet totalPossibleMoves = new MoveSet();
         for(Move possibleMove : possibleRookMoves(location, side, bitboards)) {
@@ -227,7 +221,7 @@ public class ValidMoves {
     }
 
     //returns all possible moves for a black pawn
-    private MoveSet possibleBlackPawnMoves(int location, int[][] bitboards) {
+    private static MoveSet possibleBlackPawnMoves(int location, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for (int op : BLACK_PAWN_OPERATIONS) {
@@ -290,7 +284,7 @@ public class ValidMoves {
     }
 
     //returns all possible moves for a white pawn
-    private MoveSet possibleWhitePawnMoves(int location, int[][] bitboards) {
+    private static MoveSet possibleWhitePawnMoves(int location, int[][] bitboards) {
         MoveSet totalPossibleMoves = new MoveSet();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for (int op : WHITE_PAWN_OPERATIONS) {
@@ -355,7 +349,7 @@ public class ValidMoves {
 
     //returns if the move will put the king in check
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
-    public boolean willThisMovePutOurKingInCheck(Move move) {
+    public static boolean willThisMovePutOurKingInCheck(int[][] bitboards, int[] kingLocations, Move move) {
 
         int currentLocation = move.getCurrentLocation();
         int currentBitboard = move.getCurrentBitboard();
@@ -368,11 +362,11 @@ public class ValidMoves {
 
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
-        int[] tempKingLocations = Arrays.copyOf(BOARD.kingLocations, 2);
+        int[] tempKingLocations = Arrays.copyOf(kingLocations, 2);
 
 
         for (int i = 0; i < 12; i++) {
-            System.arraycopy(BOARD.pieceBoards[i], 0, tempBitboards[i], 0, 120);
+            System.arraycopy(bitboards[i], 0, tempBitboards[i], 0, 120);
         }
 
         //simulates move change
@@ -386,11 +380,11 @@ public class ValidMoves {
             System.out.println("The new king location is " + nextLocation);
         }
 
-        return BOARD.isKingChecked(tempBitboards, currentBitboard / 6, tempKingLocations);
+        return Board.isKingChecked(tempBitboards, currentBitboard / 6, tempKingLocations);
     }
 
     //finds all possible moves for a side
-    public MoveSet allAvailableMoves(int[][] bitboards, int side) {
+    public static MoveSet allAvailableMoves(int[][] bitboards, int[] kingLocations, int side) {
         MoveSet possibleMovesForSide = new MoveSet();
         for (int i = side * 6; i < (side * 6) + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
@@ -402,7 +396,7 @@ public class ValidMoves {
                 possibleMovesForSide.addAll(possibleMovesForPiece);
                 for (Move possibleMove : possibleMovesForPiece) {
                     //if check is maintained then remove the move. it is impossible to make
-                    if (willThisMovePutOurKingInCheck(possibleMove)) {
+                    if (willThisMovePutOurKingInCheck(bitboards, kingLocations, possibleMove)) {
                         possibleMovesForSide.remove(possibleMove.getMoveLocation());
                     }
                 }
