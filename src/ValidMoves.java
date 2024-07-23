@@ -257,7 +257,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
-                    totalPossibleMoves.add(new Move(location, 6, location + BLACK_PAWN_OPERATIONS[2], k));
+                    totalPossibleMoves.add(new Move(location, 5, location + BLACK_PAWN_OPERATIONS[2], k));
                 }
                 break;
             }
@@ -272,7 +272,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
-                    totalPossibleMoves.add(new Move(location, 6, location + BLACK_PAWN_OPERATIONS[3], l));
+                    totalPossibleMoves.add(new Move(location, 5, location + BLACK_PAWN_OPERATIONS[3], l));
                 }
                 break;
             }
@@ -356,9 +356,6 @@ public class ValidMoves {
         int nextLocation = move.getMoveLocation();
         int nextBitboard = move.getNextBitboard();
 
-        if (nextBitboard == -1) {
-            nextBitboard = currentBitboard;
-        }
 
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
@@ -371,7 +368,9 @@ public class ValidMoves {
 
         //simulates move change
         tempBitboards[currentBitboard][currentLocation] = 0;
-        tempBitboards[nextBitboard][nextLocation] = 0;
+        if (nextBitboard != -1) {
+            tempBitboards[nextBitboard][nextLocation] = 0;
+        }
         tempBitboards[currentBitboard][nextLocation] = 1;
 
         //simulates king location change
