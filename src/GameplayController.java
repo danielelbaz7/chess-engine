@@ -178,7 +178,7 @@ public class GameplayController implements MouseListener {
     public void mousePressed(MouseEvent e) {
         int row = (int) (((double) e.getY()) / ((double) ChessGUI.dimension / 16) + 0.5);
         int col = e.getX() / (ChessGUI.dimension / 16);
-        if (board.isThereAPieceThere(row, col)) {
+        if (BoardMethods.isThereAPieceThere(board, row, col)) {
             setPieceSelectedGUI(row, col);
         } else {
             //controls checks
