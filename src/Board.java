@@ -14,24 +14,30 @@ public class Board {
     boolean whiteTurn = true;
     boolean[] kingsChecked = {false, false};
     int[] kingLocations = {-1, -1};
-    final ValidMoves vm = new ValidMoves(this);
-    private String[][] boardTemp;
 
-    public Board(String[][] boardTemplate) {
-        boardTemp = boardTemplate;
-        this.generateBoards(boardTemplate);
-        evaluationValue = BoardMethods.evaluateBoard(this);
-    }
+    //creates a default board template used to generate the bitboards
+    private static final String[][] boardTemplate = {
+            {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
+            {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", "k", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", " ", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", " ", "R", " ", " ", "2"},
+            {"2", " ", " ", " ", " ", "K", " ", "R", " ", "2"},
+            {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"},
+            {"2", "2", "2", "2", "2", "2", "2", "2", "2", "2"}
+    };
 
-    //constructor for making it based off of a 2d array rather than a string template
-    public Board(int[][] bitboards, int[] kingLocations) {
-        this.pieceBoards = bitboards;
-        this.kingLocations = kingLocations;
-        evaluationValue = BoardMethods.evaluateBoard(this);
+    public Board() {
+        this.generateBoards();
+        evaluationValue = BoardMethods.evaluateBoard(pieceBoards, kingLocations, whiteTurn);
     }
 
     //initializes the bitboards
-    private void createBitboards(String[][] boardTemplate) {
+    private void createBitboards(int[][] bitboards) {
         //runs the creator for each individual board
         for (int i = 0; i < 12; i++) {
             //logs the current board
@@ -109,13 +115,13 @@ public class Board {
             for (int k = 0; k < 120; k++) {
                 currentBoard[k] = Integer.parseInt(baseLong.substring(k, k + 1));
             }
-            pieceBoards[i] = currentBoard;
+            bitboards[i] = currentBoard;
         }
     }
 
     //sets the boardlist to the newly generated boards and prints the board to the console
-    public void generateBoards(String[][] boardTemplate) {
-        createBitboards(boardTemplate);
+    public void generateBoards() {
+        createBitboards(pieceBoards);
         for (int i = 0; i < 120; i++) {
             if (i % 10 == 0) {
                 System.out.println();
@@ -124,6 +130,8 @@ public class Board {
         }
         System.out.println();
     }
+
+
 
     //performs a move
     public int[][] makeMove(Move move) {
@@ -144,8 +152,26 @@ public class Board {
         return pieceBoards;
     }
 
-    public String[][] getBoardTemplate() {
-        return boardTemp;
+    public int[][] undoMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 1;
+        if(move.getNextBitboard() != -1) {
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 1;
+        }
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 0;
+
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getCurrentLocation();
+        }
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getCurrentLocation();
+        }
+
+        return pieceBoards;
+    }
+
+    public static String[][] getBoardTemplate() {
+        return boardTemplate;
     }
 
 }

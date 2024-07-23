@@ -1,39 +1,34 @@
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+
 public class ArtificialIntelligence {
 
-    Board board;
-    ValidMoves vm;
-    int[][] tempBitboards;
-    int[] tempKingLocations;
-
-    public ArtificialIntelligence(Board b) {
-        this.board = b;
-        this.vm = b.vm;
-
-        tempBitboards = new int[12][120];
-        tempKingLocations = Arrays.copyOf(b.kingLocations, 2);
-
-        for (int i = 0; i < 12; i++) {
-            System.arraycopy(b.pieceBoards[i], 0, tempBitboards[i], 0, 120);
-        }
-    }
-
     //locates best move based on tree of moves
-    public double findBestMove(Board b) {
-        int side = b.whiteTurn ? 1 : 0;
+    public static double findBestMove(Board b, int depth, boolean ourTurn) {
 
-        /*if(depth == 0 || Board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
-            return Board.evaluateBoard(tempBitboards, whiteTurn, tempKingLocations);
-        }*/
-        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves(b, side);
-        Move bestMove;
-
-        if(b.whiteTurn) {
-            double maxEval = Integer.MIN_VALUE;
-
+        if(depth == 0 || BoardMethods.isKingCheckmated(b.pieceBoards, b.kingLocations, 0) || BoardMethods.isKingCheckmated(b.pieceBoards, b.kingLocations, 1)) {
+            return BoardMethods.evaluateBoard(b.pieceBoards, b.kingLocations, true);
         }
 
-        return 1;
+        if(ourTurn) {
+            double maxEval = Integer.MIN_VALUE;
+            for(Move move : ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 1)) {
+                b.makeMove(move);
+                double eval = findBestMove(b, depth-1, false);
+                b.undoMove(move);
+                maxEval = Math.max(maxEval, eval);
+            }
+            return maxEval;
+        } else {
+            double minEval = Integer.MAX_VALUE;
+            for(Move move : ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 0)) {
+                b.makeMove(move);
+                double eval = findBestMove(b, depth-1, true);
+                b.undoMove(move);
+                minEval = Math.min(minEval, eval);
+            }
+            return minEval;
+        }
     }
 
 }

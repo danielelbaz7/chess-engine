@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameplayController implements MouseListener {
 
@@ -16,7 +14,6 @@ public class GameplayController implements MouseListener {
     public GameplayController(ChessGUI c) {
         this.chessGUI = c;
         board = chessGUI.board;
-        vm = new ValidMoves(board);
     }
 
     //makes the selected square gray and the possible moves red
@@ -28,7 +25,7 @@ public class GameplayController implements MouseListener {
                 pieceType = i;
             }
         }
-        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, board, pieceType);
+        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards, pieceType);
         //sets the current piece type
         for (int i = 0; i < 12; i++) {
             if (board.pieceBoards[i][Conv.to120RC(rowpass, colpass)] == 1) {
@@ -37,11 +34,11 @@ public class GameplayController implements MouseListener {
         }
         int otherSide = selectedPieceType > 5 ? 0 : 1;
 
-        //iterates through all possible moves and put moves that check into a moveset to avoid concurrent modification exception
+        //iterates through all possible moves and put moves that check into a hashmap to avoid concurrent modification exception
         MoveSet movesToRemove = new MoveSet();
         for (Move possibleMove : possibleMovesForSelectedPiece) {
-            if (ValidMoves.willThisMovePutOurKingInCheck(board, possibleMove)) {
-                movesToRemove.add(possibleMove);
+            if (ValidMoves.willThisMovePutOurKingInCheck(board.pieceBoards, board.kingLocations, possibleMove)) {
+                movesToRemove.add(new Move(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
             }
         }
 
@@ -185,7 +182,7 @@ public class GameplayController implements MouseListener {
             //controls checks
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
-            board.evaluationValue = BoardMethods.evaluateBoard(board);
+            board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
             if (Math.abs(board.evaluationValue) != 1000) {
                 chessGUI.evaluationValuePanel.setText(String.valueOf(board.evaluationValue));
             } else {
@@ -198,10 +195,10 @@ public class GameplayController implements MouseListener {
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if (board.kingsChecked[otherSide]) {
                 board.kingsChecked[otherSide] = false;
-            } else if (BoardMethods.isKingChecked(board, sideToCheck)) {
+            } else if (BoardMethods.isKingChecked(board.pieceBoards, board.kingLocations, sideToCheck)) {
                 board.kingsChecked[sideToCheck] = true;
                 //game over is printed outside the method as isCheckMated is used in simulation as well
-                if (ValidMoves.allAvailableMoves(board, sideToCheck).isEmpty()) {
+                if (ValidMoves.allAvailableMoves(board.pieceBoards, board.kingLocations, sideToCheck).isEmpty()) {
                     System.out.println("GAME OVER");
                 }
             }

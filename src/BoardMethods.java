@@ -1,4 +1,4 @@
-//this class holds all methods to evaluate or check features of a Board object
+//used to look at and check a Board object
 public class BoardMethods {
 
     //gui usage
@@ -16,31 +16,31 @@ public class BoardMethods {
         return false;
     }
 
-    public static boolean isKingChecked(Board b, int side) {
+    public static boolean isKingChecked(int[][] bitboards, int[] kingLocations, int side) {
         int otherSide = side == 1 ? 0 : 1;
         MoveSet totalPossibleMoves = new MoveSet();
         //looks through enemy pieces and finds their possible moves
         for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
-            for (int j = 0; j < b.pieceBoards[0].length; j++) {
-                if (b.pieceBoards[i][j] == 1) {
-                    totalPossibleMoves.addAll(ValidMoves.possibleMoveFinderAllPieces(j, b, side));
+            for (int j = 0; j < bitboards[0].length; j++) {
+                if (bitboards[i][j] == 1) {
+                    totalPossibleMoves.addAll(ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i));
                 }
             }
         }
-        return totalPossibleMoves.containsMove(b.kingLocations[side]);
+        return totalPossibleMoves.containsMove(kingLocations[side]);
     }
 
-    public static boolean isKingCheckmated(Board b, int side) {
-        return BoardMethods.isKingChecked(b, side) && ValidMoves.allAvailableMoves(b, side).isEmpty();
+    public static boolean isKingCheckmated(int[][] bitboards, int[] kingLocations, int side) {
+        return isKingChecked(bitboards, kingLocations, side) && ValidMoves.allAvailableMoves(bitboards, kingLocations, side).isEmpty();
     }
 
     //evaluates which side is winning and by how much
-    public static double evaluateBoard(Board b) {
+    public static double evaluateBoard(int[][] bitboards, int[] kingLocations, boolean isWhiteTurn) {
         //sets score to 1000 or -1000 if in check mate
         double totalScore = 0;
-        int sideToCheck = b.whiteTurn ? 1 : 0;
-        if (isKingChecked(b, sideToCheck)) {
-            if (ValidMoves.allAvailableMoves(b, sideToCheck).isEmpty()) {
+        int sideToCheck = isWhiteTurn ? 1 : 0;
+        if (BoardMethods.isKingChecked(bitboards, kingLocations, sideToCheck)) {
+            if (ValidMoves.allAvailableMoves(bitboards, kingLocations, sideToCheck).isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;
                     return totalScore;
@@ -65,8 +65,8 @@ public class BoardMethods {
             };
             double negativeOrPositive = baseValue > 0 ? 1 : -1;
             //runs through each bitboard, checks if there is a piece there
-            for (int j = 0; j < b.pieceBoards[i].length; j++) {
-                if (b.pieceBoards[i][j] == 1) {
+            for (int j = 0; j < bitboards[i].length; j++) {
+                if (bitboards[i][j] == 1) {
                     //if there is a piece there, find the value and find its distance from the center and multiply that by the base value
 
                     /*double centerDistance = Math.abs(Conv.to64From120(j) % 8 - 3.5);
@@ -80,18 +80,18 @@ public class BoardMethods {
                     } else if (i == 10) {
                         totalScore += ((j / 10) - 9) * 0.50;
                     } else {
-                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, b, i)) {
+                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getNextBitboard() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), b, i).containsMove(j)) {
+                                if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
                                     System.out.println(possibleMove.getMoveLocation() + "IS THE PIECE WE ARE ATTACKING");
-                                    totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), b)) * -1;
+                                    totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
                                 } else {
-                                    totalScore += (getBaseValue(possibleMove.getMoveLocation(), b) * -1);
+                                    totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
                                 }
                             }
                         }
@@ -104,11 +104,11 @@ public class BoardMethods {
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
-    private static int getBaseValue(int location, Board b) {
+    private static int getBaseValue(int location, int[][] bitboards) {
         int boardWithPiece = -1;
 
         for (int i = 0; i < 12; i++) {
-            if (b.pieceBoards[i][location] == 1) {
+            if (bitboards[i][location] == 1) {
                 boardWithPiece = i;
             }
         }
@@ -125,6 +125,5 @@ public class BoardMethods {
             default -> 0;
         };
     }
-
 
 }
