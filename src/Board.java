@@ -126,12 +126,12 @@ public class Board {
     }
 
     //performs a move
-    public int[][] doMove(int[][] bitboards, Move move) {
-        bitboards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
+    public int[][] makeMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
         if(move.getNextBitboard() != -1) {
-            bitboards[move.getNextBitboard()][move.getMoveLocation()] = 0;
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 0;
         }
-        bitboards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
 
         //simulates king move
         if(move.getCurrentBitboard() == 4) {
@@ -141,7 +141,7 @@ public class Board {
             kingLocations[1] = move.getMoveLocation();
         }
 
-        return bitboards;
+        return pieceBoards;
     }
 
     public String[][] getBoardTemplate() {
