@@ -131,31 +131,16 @@ public class Board {
         System.out.println();
     }
 
-
-
     //moved to board as it made more sense, checks the current board value
     //no longer static to remove static global state
 
-    public static boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
-        int otherSide = side == 1 ? 0 : 1;
-        MoveSet totalPossibleMoves = new MoveSet();
-        //looks through enemy pieces and finds their possible moves
-        for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
-            for (int j = 0; j < bitboards[0].length; j++) {
-                if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.addAll(ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i));
-                }
-            }
-        }
-        return totalPossibleMoves.containsMove(kingLocations[side]);
-    }
 
     //evaluates which side is winning and by how much
     public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn) {
         //sets score to 1000 or -1000 if in check mate
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
-        if (isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
+        if (BoardMethods.isKingChecked(pieceBoards, kingLocations, sideToCheck)) {
             if (ValidMoves.allAvailableMoves(pieceBoards, kingLocations, sideToCheck).isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;

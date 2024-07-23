@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameplayController implements MouseListener {
 
@@ -197,7 +195,7 @@ public class GameplayController implements MouseListener {
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if (board.kingsChecked[otherSide]) {
                 board.kingsChecked[otherSide] = false;
-            } else if (Board.isKingChecked(board.pieceBoards, sideToCheck, board.kingLocations)) {
+            } else if (BoardMethods.isKingChecked(board.pieceBoards, board.kingLocations, sideToCheck)) {
                 board.kingsChecked[sideToCheck] = true;
                 //game over is printed outside the method as isCheckMated is used in simulation as well
                 if (ValidMoves.allAvailableMoves(board.pieceBoards, board.kingLocations, sideToCheck).isEmpty()) {

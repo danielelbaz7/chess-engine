@@ -379,7 +379,7 @@ public class ValidMoves {
             System.out.println("The new king location is " + nextLocation);
         }
 
-        return Board.isKingChecked(tempBitboards, currentBitboard / 6, tempKingLocations);
+        return BoardMethods.isKingChecked(tempBitboards, tempKingLocations, currentBitboard / 6);
     }
 
     //finds all possible moves for a side
