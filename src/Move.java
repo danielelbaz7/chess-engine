@@ -34,6 +34,10 @@ public class Move {
     public int getNextBitboard() {
         return nextBitboard;
     }
+
+    public String toString() {
+        return currentLocation + ", " + currentBitboard + " -> " + moveLocation + ", " + nextBitboard;
+    }
     
     @Override
     public boolean equals(Object o) {
