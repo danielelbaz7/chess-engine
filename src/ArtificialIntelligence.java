@@ -11,13 +11,24 @@ public class ArtificialIntelligence {
         }
 
         if(ourTurn) {
-            int maxEval = Integer.MIN_VALUE;
+            double maxEval = Integer.MIN_VALUE;
             for(Move move : ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 1)) {
-                
+                b.makeMove(move);
+                double eval = findBestMove(b, depth-1, false);
+                b.undoMove(move);
+                maxEval = Math.max(maxEval, eval);
             }
+            return maxEval;
+        } else {
+            double minEval = Integer.MAX_VALUE;
+            for(Move move : ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 0)) {
+                b.makeMove(move);
+                double eval = findBestMove(b, depth-1, true);
+                b.undoMove(move);
+                minEval = Math.min(minEval, eval);
+            }
+            return minEval;
         }
-
-        return null;
     }
 
 }
