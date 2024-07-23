@@ -131,9 +131,7 @@ public class Board {
         System.out.println();
     }
 
-    public int[][] makeMove(Move move) {
 
-    }
 
     public static String[][] getBoardTemplate() {
         return boardTemplate;
