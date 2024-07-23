@@ -12,7 +12,7 @@ public class ChessGUI {
     JLabel evaluationValuePanel;
     JPanel chessPanel = new JPanel();
     JPanel evaluationPanel = new JPanel();
-    String[][] mainBoard = Board.getBoardTemplate();
+    String[][] mainBoard;
     public JLabel[] JLabelCollection;
     int[] pieceSelectedAndCoordinate = new int[2];
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
@@ -21,6 +21,7 @@ public class ChessGUI {
     //sets the board to the board passed and creates the chess gui
     public ChessGUI(Board b) {
         this.board = b;
+        mainBoard = board.getBoardTemplate();
         evaluationValuePanel = new JLabel(String.valueOf(board.evaluationValue));
         JLabelCollection = new JLabel[64];
         this.startChessGUI();

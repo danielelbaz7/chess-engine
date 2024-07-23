@@ -19,21 +19,21 @@ public class ArtificialIntelligence {
     }
 
     //locates best move based on tree of moves
-    public double findBestMove(Board board) {
-        int side = board.whiteTurn ? 1 : 0;
+    public double findBestMove(Board b) {
+        int side = b.whiteTurn ? 1 : 0;
 
         /*if(depth == 0 || Board.isKingCheckmated(tempBitboards, side, tempKingLocations)) {
             return Board.evaluateBoard(tempBitboards, whiteTurn, tempKingLocations);
         }*/
-        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves()
-        Move bestMove = ;
+        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves(b, side);
+        Move bestMove;
 
-        if(whiteTurn) {
+        if(b.whiteTurn) {
             double maxEval = Integer.MIN_VALUE;
 
         }
 
-        return null;
+        return 1;
     }
 
 }
