@@ -8,7 +8,6 @@ public class GameplayController implements MouseListener {
     MoveSet possibleMovesForSelectedPiece = null;
     int selectedPieceType = -1;
     Board board;
-    ValidMoves vm;
     ChessGUI chessGUI;
 
     public GameplayController(ChessGUI c) {
@@ -183,12 +182,17 @@ public class GameplayController implements MouseListener {
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
             board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
+            if(chessGUI.bestMovePanel.isVisible()) {
+                MoveAndEval<Move, Double> bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, true);
+                chessGUI.bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1) +
+                        "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1) + "</html>");
+            }
             if (Math.abs(board.evaluationValue) != 1000) {
-                chessGUI.evaluationValuePanel.setText(String.valueOf(board.evaluationValue));
+                chessGUI.evaluationValueLabel.setText(String.valueOf(board.evaluationValue));
             } else {
                 switch ((int) board.evaluationValue) {
-                    case -1000 -> chessGUI.evaluationValuePanel.setText("-M");
-                    case 1000 -> chessGUI.evaluationValuePanel.setText("M");
+                    case -1000 -> chessGUI.evaluationValueLabel.setText("-M");
+                    case 1000 -> chessGUI.evaluationValueLabel.setText("M");
                 }
             }
             int sideToCheck = board.whiteTurn ? 1 : 0;

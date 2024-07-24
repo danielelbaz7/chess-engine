@@ -122,13 +122,6 @@ public class Board {
     //sets the boardlist to the newly generated boards and prints the board to the console
     public void generateBoards() {
         createBitboards(pieceBoards);
-        for (int i = 0; i < 120; i++) {
-            if (i % 10 == 0) {
-                System.out.println();
-            }
-            System.out.print(pieceBoards[5][i]);
-        }
-        System.out.println();
     }
 
 

@@ -9,10 +9,13 @@ public class ChessGUI {
     Board board;
     JFrame gameFrame = new JFrame();
     JPanel titlePanel = new JPanel();
-    JLabel evaluationValuePanel;
+    JLabel evaluationValueLabel;
     JPanel chessPanel = new JPanel();
     JPanel evaluationPanel = new JPanel();
+    JPanel bestMovePanel = new JPanel();
+    JLabel bestMove;
     String[][] mainBoard;
+    MoveAndEval<Move, Double> bestMoveAndEval;
     public JLabel[] JLabelCollection;
     int[] pieceSelectedAndCoordinate = new int[2];
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
@@ -22,7 +25,11 @@ public class ChessGUI {
     public ChessGUI(Board b) {
         this.board = b;
         mainBoard = board.getBoardTemplate();
-        evaluationValuePanel = new JLabel(String.valueOf(board.evaluationValue));
+        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, board.whiteTurn);
+        evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
+        bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1) +
+                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1) + "</html>");
+        bestMove.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/50));
         JLabelCollection = new JLabel[64];
         this.startChessGUI();
     }
@@ -104,7 +111,7 @@ public class ChessGUI {
         authorText.setForeground(Color.BLUE);
 
         JCheckBox showEvaluationCheckBox = getEvaluationCheckBox();
-        JCheckBox artificialIntelligenceAssistantCheckBox = new JCheckBox("Show best move using AI?");
+        JCheckBox artificialIntelligenceAssistantCheckBox = getAICheckBox();
 
 
         titlePanel.add(titleAndCheckBox);
@@ -121,9 +128,9 @@ public class ChessGUI {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    evaluationValuePanel.setVisible(true);
+                    evaluationValueLabel.setVisible(true);
                 } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    evaluationValuePanel.setVisible(false);
+                    evaluationValueLabel.setVisible(false);
                 }
             }
         });
@@ -131,13 +138,38 @@ public class ChessGUI {
         return showEvaluationCheckBox;
     }
 
+    private JCheckBox getAICheckBox() {
+        JCheckBox artificialIntelligenceAssistantCheckBox = new JCheckBox();
+        artificialIntelligenceAssistantCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    bestMove.setVisible(true);
+                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    bestMove.setVisible(false);
+                }
+            }
+        });
+        artificialIntelligenceAssistantCheckBox.setText("Show best move with AI?");
+        return artificialIntelligenceAssistantCheckBox;
+    }
+
     private void initializeEvaluationPanel() {
         //creates eval panel with a box that grows in height depending on who is winning
         //set to black for visibility, temporary
-        evaluationValuePanel.setForeground(Color.BLACK);
-        evaluationValuePanel.setVisible(false);
-        evaluationPanel.add(evaluationValuePanel);
+        evaluationValueLabel.setForeground(Color.BLACK);
+        evaluationValueLabel.setVisible(false);
+        evaluationPanel.add(evaluationValueLabel);
         evaluationPanel.setVisible(true);
+    }
+
+    private void initializeBestMovePanel() {
+        //creates the best move panel
+        bestMovePanel.setForeground(Color.BLACK);
+        bestMove.setVisible(false);
+        bestMovePanel.add(bestMove);
+        bestMovePanel.setVisible(true);
+
     }
 
     public void placeBoardsAgain() {
@@ -156,10 +188,17 @@ public class ChessGUI {
         }
     }
 
+    public void showBestMove() {
+        Move bestMove = ArtificialIntelligence.findBestMove(board, 3, true).getMove();
+        JLabelCollection[Conv.to64From120(bestMove.getCurrentLocation())].setBackground(Color.CYAN);
+        JLabelCollection[Conv.to64From120(bestMove.getMoveLocation())].setBackground(Color.CYAN);
+    }
+
     public void startChessGUI() {
         initializeChessPanel();
         initializeTitlePanel();
         initializeEvaluationPanel();
+        initializeBestMovePanel();
 
         gameFrame.setResizable(false);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -167,18 +206,21 @@ public class ChessGUI {
 
         chessPanel.setSize(dimension / 2, dimension / 2);
         titlePanel.setPreferredSize(new Dimension((int)
-                (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()), dimension / 30));
+                (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth() + bestMovePanel.getPreferredSize().getWidth()), dimension / 30));
 
         evaluationPanel.setPreferredSize
                 (new Dimension(dimension / 30, (int) ((dimension / 2) + titlePanel.getPreferredSize().getHeight())));
 
+        bestMovePanel.setPreferredSize
+                (new Dimension(dimension / 30, (int) ((dimension / 2) + titlePanel.getPreferredSize().getHeight())));
 
         gameFrame.add(chessPanel, BorderLayout.CENTER);
         gameFrame.add(titlePanel, BorderLayout.NORTH);
         gameFrame.add(evaluationPanel, BorderLayout.WEST);
+        gameFrame.add(bestMovePanel, BorderLayout.EAST);
 
         //sets the size to accommodate the other pieces of the window
-        gameFrame.setSize((int) (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth()),
+        gameFrame.setSize((int) (chessPanel.getWidth() + evaluationPanel.getPreferredSize().getWidth() + bestMovePanel.getPreferredSize().getWidth()),
                 (int) (chessPanel.getHeight() + titlePanel.getPreferredSize().getHeight()));
         gameFrame.setVisible(true);
     }
