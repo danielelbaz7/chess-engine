@@ -24,7 +24,8 @@ public class GameplayController implements MouseListener {
                 pieceType = i;
             }
         }
-        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards, pieceType);
+        int[][] bitboards = board.pieceBoards;
+        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, bitboards, pieceType);
         //sets the current piece type
         for (int i = 0; i < 12; i++) {
             if (board.pieceBoards[i][Conv.to120RC(rowpass, colpass)] == 1) {

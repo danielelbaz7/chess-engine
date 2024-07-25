@@ -18,6 +18,8 @@ public class ChessGUI {
     JLabel bestMove;
     String[][] mainBoard;
     MoveAndEval<Move, Double> bestMoveAndEval;
+    Thread runningAIThread;
+
     public JLabel[] JLabelCollection;
     int[] pieceSelectedAndCoordinate = new int[2];
     public static int dimension = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
@@ -164,15 +166,20 @@ public class ChessGUI {
             @Override
             //sets visibility on button press
             public void actionPerformed(ActionEvent e) {
-                Thread generatingMoveThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 5, board.whiteTurn);
-                        bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
-                                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
-                    }
-                });
-                generatingMoveThread.start();
+
+                if(runningAIThread == null || !runningAIThread.isAlive()) {
+                    runningAIThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println(Thread.currentThread().threadId() + "!");
+                            Board b = new Board(board);
+                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 3, board.whiteTurn);
+                            bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
+                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "</html>");
+                        }
+                    });
+                    runningAIThread.start();
+                }
             }
         });
         artificialIntelligenceAssistantButton.setText("Generate best move with AI?");

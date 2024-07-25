@@ -88,7 +88,6 @@ public class BoardMethods {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
                                 if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
-                                    System.out.println(possibleMove.getMoveLocation() + "IS THE PIECE WE ARE ATTACKING");
                                     totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
                                 } else {
                                     totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);

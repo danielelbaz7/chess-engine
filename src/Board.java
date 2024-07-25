@@ -36,6 +36,12 @@ public class Board {
         evaluationValue = BoardMethods.evaluateBoard(pieceBoards, kingLocations, whiteTurn);
     }
 
+    public Board(Board b) {
+        this.pieceBoards = b.pieceBoards;
+        this.whiteTurn = b.whiteTurn;
+        evaluationValue = BoardMethods.evaluateBoard(pieceBoards, kingLocations, whiteTurn);
+    }
+
     //initializes the bitboards
     private void createBitboards(int[][] bitboards) {
         //runs the creator for each individual board
