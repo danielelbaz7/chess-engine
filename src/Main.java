@@ -4,9 +4,14 @@ public class Main {
         //generates a board and a gui based on it
         Board gameBoard = new Board();
         ChessGUI chessGUI = new ChessGUI(gameBoard);
-        MoveAndEval<Move, Double> me = ArtificialIntelligence.findBestMove(new Board(), 3, true);
-        System.out.println(me.getMove());
-        System.out.println(me.getEval());
+
+        System.out.println(ArtificialIntelligence.countOfOps);
+        System.out.println(System.currentTimeMillis());
+        for(int i = 0; i < 1; i++) {
+            ArtificialIntelligence.findBestMove(gameBoard, 5, gameBoard.whiteTurn);
+        }
+        System.out.println(System.currentTimeMillis());
+        System.out.println(ArtificialIntelligence.countOfOps);
 
     }
 }

@@ -167,7 +167,7 @@ public class ChessGUI {
                 Thread generatingMoveThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, board.whiteTurn);
+                        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 5, board.whiteTurn);
                         bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
                                 "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
                     }

@@ -1,9 +1,6 @@
-public class ArtificialIntelligence extends Thread{
+public class ArtificialIntelligence{
 
-
-    public void run(Board b, int depth, boolean ourTurn) {
-        findBestMove(b, depth, ourTurn);
-    }
+    static int countOfOps = 0;
 
     //locates best move based on tree of moves
     public static MoveAndEval<Move, Double> findBestMove(Board b, int depth, boolean ourTurn) {
@@ -18,6 +15,7 @@ public class ArtificialIntelligence extends Thread{
         if(ourTurn) {
             double maxEval = Integer.MIN_VALUE;
             for(Move move : allPossibleMoves) {
+                countOfOps++;
                 b.makeMove(move);
                 double eval = findBestMove(b, depth-1, false).getEval();
                 b.undoMove(move);
@@ -31,6 +29,7 @@ public class ArtificialIntelligence extends Thread{
         } else {
             double minEval = Integer.MAX_VALUE;
             for(Move move : allPossibleMoves) {
+                countOfOps++;
                 b.makeMove(move);
                 double eval = findBestMove(b, depth-1, true).getEval();
                 b.undoMove(move);
