@@ -1,4 +1,9 @@
-public class ArtificialIntelligence {
+public class ArtificialIntelligence extends Thread{
+
+
+    public void run(Board b, int depth, boolean ourTurn) {
+        findBestMove(b, depth, ourTurn);
+    }
 
     //locates best move based on tree of moves
     public static MoveAndEval<Move, Double> findBestMove(Board b, int depth, boolean ourTurn) {

@@ -182,11 +182,6 @@ public class GameplayController implements MouseListener {
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
             board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
-            if(chessGUI.bestMovePanel.isVisible()) {
-                MoveAndEval<Move, Double> bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, true);
-                chessGUI.bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1) +
-                        "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1) + "</html>");
-            }
             if (Math.abs(board.evaluationValue) != 1000) {
                 chessGUI.evaluationValueLabel.setText(String.valueOf(board.evaluationValue));
             } else {

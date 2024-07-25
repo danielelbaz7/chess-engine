@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -27,9 +29,9 @@ public class ChessGUI {
         mainBoard = board.getBoardTemplate();
         bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, board.whiteTurn);
         evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
-        bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1) +
-                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1) + "</html>");
-        bestMove.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/50));
+        bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
+                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
+        bestMove.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/80));
         JLabelCollection = new JLabel[64];
         this.startChessGUI();
     }
@@ -111,15 +113,33 @@ public class ChessGUI {
         authorText.setForeground(Color.BLUE);
 
         JCheckBox showEvaluationCheckBox = getEvaluationCheckBox();
-        JCheckBox artificialIntelligenceAssistantCheckBox = getAICheckBox();
+        JCheckBox showAIBestMove = getShowAICheckBox();
+        JButton artificialIntelligenceAssistantButton = getAIButton();
 
 
         titlePanel.add(titleAndCheckBox);
         titlePanel.add(authorText);
         titlePanel.add(showEvaluationCheckBox);
-        titlePanel.add(artificialIntelligenceAssistantCheckBox);
+        titlePanel.add(artificialIntelligenceAssistantButton);
+        titlePanel.add(showAIBestMove);
         titlePanel.setVisible(true);
 
+    }
+
+    private JCheckBox getShowAICheckBox() {
+        JCheckBox showAIBestMove = new JCheckBox();
+        showAIBestMove.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    bestMove.setVisible(true);
+                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    bestMove.setVisible(false);
+                }
+            }
+        });
+        showAIBestMove.setText("Show best move?");
+        return showAIBestMove;
     }
 
     private JCheckBox getEvaluationCheckBox() {
@@ -138,20 +158,25 @@ public class ChessGUI {
         return showEvaluationCheckBox;
     }
 
-    private JCheckBox getAICheckBox() {
-        JCheckBox artificialIntelligenceAssistantCheckBox = new JCheckBox();
-        artificialIntelligenceAssistantCheckBox.addItemListener(new ItemListener() {
+    private JButton getAIButton() {
+        JButton artificialIntelligenceAssistantButton = new JButton();
+        artificialIntelligenceAssistantButton.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    bestMove.setVisible(true);
-                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    bestMove.setVisible(false);
-                }
+            //sets visibility on button press
+            public void actionPerformed(ActionEvent e) {
+                Thread generatingMoveThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, board.whiteTurn);
+                        bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
+                                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
+                    }
+                });
+                generatingMoveThread.start();
             }
         });
-        artificialIntelligenceAssistantCheckBox.setText("Show best move with AI?");
-        return artificialIntelligenceAssistantCheckBox;
+        artificialIntelligenceAssistantButton.setText("Generate best move with AI?");
+        return artificialIntelligenceAssistantButton;
     }
 
     private void initializeEvaluationPanel() {
