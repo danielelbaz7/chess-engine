@@ -10,6 +10,10 @@ public class GameplayController implements MouseListener {
     Board board;
     ChessGUI chessGUI;
 
+    Thread pieceSelectThread;
+    Thread deselectPieceThread;
+    Thread movingPieceThread;
+
     public GameplayController(ChessGUI c) {
         this.chessGUI = c;
         board = chessGUI.board;
@@ -54,7 +58,15 @@ public class GameplayController implements MouseListener {
 
         if ((chessGUI.isPieceSelected() == 0)) {
             chessGUI.JLabelCollection[(rowpass * 8) + colpass].setBackground(Color.DARK_GRAY);
-            chessGUI.setPieceSelectedTrue(rowpass, colpass);
+            if(pieceSelectThread == null || !pieceSelectThread.isAlive()) {
+                pieceSelectThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        chessGUI.setPieceSelectedTrue(rowpass, colpass);
+                    }
+                });
+                pieceSelectThread.start();
+            }
             //handles showing the possible moves
             for (Move possibleMove : possibleMovesForSelectedPiece) {
                 //checks for capture
@@ -68,16 +80,25 @@ public class GameplayController implements MouseListener {
 
         //deselects and sets colors back
         else if ((chessGUI.getPointSelected() - colpass) - (rowpass * 8) == 0) {
-            selectedPiece = -1;
-            selectedPieceType = -1;
-            setSquareToOriginalColor(rowpass, colpass);
-            for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
-                //checks for capture
-                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
-                        Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
+            if(deselectPieceThread == null || !deselectPieceThread.isAlive()) {
+                deselectPieceThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        selectedPiece = -1;
+                        selectedPieceType = -1;
+                        setSquareToOriginalColor(rowpass, colpass);
+                        for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
+                            //checks for capture
+                            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
+                                    Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
+                        }
+                        chessGUI.setPieceSelectedFalse();
+                        possibleMovesForSelectedPiece = null;
+                    }
+                });
+                deselectPieceThread.start();
             }
-            chessGUI.setPieceSelectedFalse();
-            possibleMovesForSelectedPiece = null;
+
         }
 
         chessGUI.placeBoardsAgain();

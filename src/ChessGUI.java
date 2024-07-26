@@ -29,7 +29,7 @@ public class ChessGUI {
     public ChessGUI(Board b) {
         this.board = b;
         mainBoard = board.getBoardTemplate();
-        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, board.whiteTurn);
+        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
         evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
         bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
                 "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
@@ -173,7 +173,7 @@ public class ChessGUI {
                         public void run() {
                             System.out.println(Thread.currentThread().threadId() + "!");
                             Board b = new Board(board);
-                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 3, board.whiteTurn);
+                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
                             bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
                                     "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "</html>");
                         }
@@ -218,12 +218,6 @@ public class ChessGUI {
         for (int i = 0; i < Math.round(board.evaluationValue); i++) {
 
         }
-    }
-
-    public void showBestMove() {
-        Move bestMove = ArtificialIntelligence.findBestMove(board, 3, true).getMove();
-        JLabelCollection[Conv.to64From120(bestMove.getCurrentLocation())].setBackground(Color.CYAN);
-        JLabelCollection[Conv.to64From120(bestMove.getMoveLocation())].setBackground(Color.CYAN);
     }
 
     public void startChessGUI() {
