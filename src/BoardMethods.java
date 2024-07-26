@@ -70,12 +70,6 @@ public class BoardMethods {
             //runs through each bitboard, checks if there is a piece there
             for (int j = 0; j < bitboards[i].length; j++) {
                 if (bitboards[i][j] == 1) {
-                    //if there is a piece there, find the value and find its distance from the center and multiply that by the base value
-
-                    /*double centerDistance = Math.abs(Conv.to64From120(j) % 8 - 3.5);
-                    double heightDistance = Math.abs(Conv.to64From120(j) / 8 - 3.5);
-                    totalScore += (baseValue / (centerDistance * heightDistance)) / 4;*/
-
                     totalScore += baseValue;
 
                     if (i == 4) {
@@ -86,15 +80,10 @@ public class BoardMethods {
                         for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getNextBitboard() == -1) {
-                                totalScore += negativeOrPositive * 0.05;
+                                totalScore += (negativeOrPositive * 0.05);
                             } else {
-                                //if the other piece can attack our tested piece, add to the total score the basevalue
-                                // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
-                                    totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
-                                } else {
-                                    totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
-                                }
+                                //if we are attacking a piece, add its value to our score
+                                totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
                             }
                         }
                     }

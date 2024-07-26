@@ -43,7 +43,7 @@ public class Board {
     }
 
     //initializes the bitboards
-    private void createBitboards(int[][] bitboards) {
+    private void createBitboards() {
         //runs the creator for each individual board
         for (int i = 0; i < 12; i++) {
             //logs the current board
@@ -121,13 +121,13 @@ public class Board {
             for (int k = 0; k < 120; k++) {
                 currentBoard[k] = Integer.parseInt(baseLong.substring(k, k + 1));
             }
-            bitboards[i] = currentBoard;
+            pieceBoards[i] = currentBoard;
         }
     }
 
     //sets the boardlist to the newly generated boards and prints the board to the console
     public void generateBoards() {
-        createBitboards(pieceBoards);
+        createBitboards();
     }
 
 

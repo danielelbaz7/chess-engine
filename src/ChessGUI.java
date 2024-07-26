@@ -28,8 +28,9 @@ public class ChessGUI {
     //sets the board to the board passed and creates the chess gui
     public ChessGUI(Board b) {
         this.board = b;
-        mainBoard = board.getBoardTemplate();
-        bestMoveAndEval = ArtificialIntelligence.findBestMove(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+        mainBoard = Board.getBoardTemplate();
+        Board fakeBoard = new Board(board);
+        bestMoveAndEval = ArtificialIntelligence.findBestMove(fakeBoard, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
         evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
         bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
                 "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
