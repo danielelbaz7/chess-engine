@@ -78,7 +78,7 @@ public class BoardMethods {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //add to total score the value of the other piece
-                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                totalScore += getBaseValue(possibleMove.getNextBitboard()) * -1;
                             }
                         }
                     } else if (i == 10) {
@@ -89,7 +89,7 @@ public class BoardMethods {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //add to total score the value of the other piece
-                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                totalScore += getBaseValue(possibleMove.getNextBitboard()) * -1;
                             }
                         }
                     } else {
@@ -99,7 +99,8 @@ public class BoardMethods {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //add to total score the value of the other piece
-                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                double multiplier = ((i/6) == sideToCheck) ? -1 : 0;
+                                totalScore += getBaseValue(possibleMove.getNextBitboard()) * multiplier;
                                 //if the move is the other king
                                 if(possibleMove.getNextBitboard() == (10 - ((i/6)*6))) {
                                     if(!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i/6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
@@ -117,16 +118,8 @@ public class BoardMethods {
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
-    private static int getBaseValue(int location, int[][] bitboards) {
-        int boardWithPiece = -1;
-
-        for (int i = 0; i < 12; i++) {
-            if (bitboards[i][location] == 1) {
-                boardWithPiece = i;
-            }
-        }
-
-        return switch (boardWithPiece) {
+    private static int getBaseValue(int bitboard) {
+        return switch (bitboard) {
             case 0 -> -5;
             case 1, 2 -> -3;
             case 3 -> -9;
