@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 //used to look at and check a Board object
 public class BoardMethods {
 
@@ -46,6 +48,7 @@ public class BoardMethods {
             }
         }
         //adds or removes based on distance and piece value
+        HashSet<Integer> piecesAlreadyAtRisk = new HashSet<>();
         for (int i = 0; i < 12; i++) {
             int baseValue = switch (i) {
                 case 0 -> -5;
@@ -70,23 +73,24 @@ public class BoardMethods {
 
                     totalScore += baseValue;
 
-                    if (i == 4) {
-                        totalScore += ((j / 10) - 2) * 0.50;
-                    } else if (i == 10) {
-                        totalScore += ((j / 10) - 9) * 0.50;
                     } else {
                         for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
-                            if (possibleMove.getNextBitboard() == -1) {
+                            int nextBoard = possibleMove.getNextBitboard();
+                            int nextMove = possibleMove.getMoveLocation();
+                            if (nextBoard == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                if(!piecesAlreadyAtRisk.contains(nextMove)) {
+                                    totalScore += getBaseValue(nextMove, bitboards) * -1;
+                                }
+                                piecesAlreadyAtRisk.add(nextMove);
                                 //if the move is the other king
-                                if(possibleMove.getNextBitboard() == (10 - ((i/6)*6))) {
+                                if(nextBoard == (10 - ((i/6)*6))) {
                                     if(!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i/6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
-                                        totalScore += 10 * (((i/6) == 1) ? 1 : -1);
+                                        totalScore += 10 * (((i / 6) == 1) ? 1 : -1);
                                     }
                                 }
                             }
