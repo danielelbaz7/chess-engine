@@ -6,10 +6,12 @@ public class Main {
         ChessGUI chessGUI = new ChessGUI(gameBoard);
         long time = -System.currentTimeMillis();
         long ops = -ArtificialIntelligence.countOfOps;
-        System.out.println(ArtificialIntelligence.findBestMove(gameBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameBoard.whiteTurn).getEval());
+        GameplayController.allowMovement = false;
+        System.out.println(ArtificialIntelligence.findBestMove(gameBoard, 1, Integer.MIN_VALUE, Integer.MAX_VALUE, gameBoard.whiteTurn).getEval());
+        GameplayController.allowMovement = true;
         time += System.currentTimeMillis();
         ops += ArtificialIntelligence.countOfOps;
-        System.out.println((double)time/1000 + " seconds, " + ops + " total operations. " + (1000*ops)/(time) + " operations a second.");
+        System.out.println((double) time / 1000 + " seconds, " + ops + " total operations. " + (1000 * ops) / (time) + " operations a second.");
 
     }
 }

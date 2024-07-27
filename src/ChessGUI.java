@@ -31,11 +31,13 @@ public class ChessGUI {
         this.board = b;
         mainBoard = Board.getBoardTemplate();
         Board fakeBoard = new Board(board);
+        GameplayController.allowMovement = false;
         bestMoveAndEval = ArtificialIntelligence.findBestMove(fakeBoard, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+        GameplayController.allowMovement = true;
         evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
-        bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())+1)%8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()))/8)+1) +
-                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())+1)%8  + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()))/8)+1) + "</html>");
-        bestMove.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension/80));
+        bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
+                "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "<br>" + "</html>");
+        bestMove.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension / 80));
         JLabelCollection = new JLabel[64];
         this.startChessGUI();
     }
@@ -169,16 +171,20 @@ public class ChessGUI {
             //sets visibility on button press
             public void actionPerformed(ActionEvent e) {
 
-                if(runningAIThread == null || !runningAIThread.isAlive()) {
+                if (runningAIThread == null || !runningAIThread.isAlive()) {
                     runningAIThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            System.out.println(Thread.currentThread().threadId() + "!");
+                            GameplayController.allowMovement = false;
+                            bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
+                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) +
+                                    "<br>" + "↻" + "</html>");
                             Board b = new Board(board);
-                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
                             System.out.println(bestMoveAndEval.getEval());
-                            bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8)+1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
-                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8)+1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "</html>");
+                            bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
+                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "<br>" + " " + "</html>");
+                            GameplayController.allowMovement = true;
                         }
                     });
                     runningAIThread.start();
@@ -210,16 +216,6 @@ public class ChessGUI {
     public void placeBoardsAgain() {
         for (JLabel j : JLabelCollection) {
             chessPanel.add(j);
-        }
-    }
-
-    public void drawEvalBar() {
-        //resets eval bar
-        for (int j = 0; j < 100; j++) {
-            evaluationPanel.setForeground(Color.WHITE);
-        }
-        for (int i = 0; i < Math.round(board.evaluationValue); i++) {
-
         }
     }
 

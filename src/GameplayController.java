@@ -10,6 +10,8 @@ public class GameplayController implements MouseListener {
     Board board;
     ChessGUI chessGUI;
 
+    public static boolean allowMovement = true;
+
     Thread pieceSelectThread;
     Thread deselectPieceThread;
     Thread movingPieceThread;
@@ -58,7 +60,7 @@ public class GameplayController implements MouseListener {
 
         if ((chessGUI.isPieceSelected() == 0)) {
             chessGUI.JLabelCollection[(rowpass * 8) + colpass].setBackground(Color.DARK_GRAY);
-            if(pieceSelectThread == null || !pieceSelectThread.isAlive()) {
+            if (pieceSelectThread == null || !pieceSelectThread.isAlive()) {
                 pieceSelectThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -80,7 +82,7 @@ public class GameplayController implements MouseListener {
 
         //deselects and sets colors back
         else if ((chessGUI.getPointSelected() - colpass) - (rowpass * 8) == 0) {
-            if(deselectPieceThread == null || !deselectPieceThread.isAlive()) {
+            if (deselectPieceThread == null || !deselectPieceThread.isAlive()) {
                 deselectPieceThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -195,6 +197,9 @@ public class GameplayController implements MouseListener {
     //sets the selected square dark gray if there is a playable piece there
     @Override
     public void mousePressed(MouseEvent e) {
+        if (!allowMovement) {
+            return;
+        }
         int row = (int) (((double) e.getY()) / ((double) ChessGUI.dimension / 16) + 0.5);
         int col = e.getX() / (ChessGUI.dimension / 16);
         if (BoardMethods.isThereAPieceThere(board, row, col)) {
