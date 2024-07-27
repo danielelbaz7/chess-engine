@@ -58,8 +58,44 @@ public class BoardMethods {
                 kingsChecked[sideToCheck] = true;
             }
         }
+
+        for(Move possibleCurrentSideMove : availableMovesForSideToMove) {
+            int currentBitboard = possibleCurrentSideMove.getCurrentBitboard();
+            totalScore += getBaseValue(currentBitboard);
+            if(currentBitboard == 10) {
+                totalScore -= 0.5 * ((Conv.to64From120(possibleCurrentSideMove.getCurrentBitboard())/8)-7);
+            }
+            totalScore += 0.05;
+            int nextBitboard = possibleCurrentSideMove.getNextBitboard();
+            if(nextBitboard != -1) {
+                totalScore += (getBaseValue(nextBitboard) * -1);
+            }
+        }
+
+        MoveSet otherSideCaptures = new MoveSet();
+        for(Move possibleOtherSideMove : availableMovesForSideNotMoving) {
+            int currentBitboard = possibleOtherSideMove.getCurrentBitboard();
+            totalScore += getBaseValue(currentBitboard);
+            if(currentBitboard == 4) {
+                totalScore += 0.5 * ((Conv.to64From120(possibleOtherSideMove.getCurrentBitboard())/8));
+            }
+            totalScore += 0.05;
+            if(possibleOtherSideMove.getNextBitboard() != -1) {
+                otherSideCaptures.add(possibleOtherSideMove);
+            }
+        }
+
+        int bestCapture = 0;
+        for(Move capture : otherSideCaptures) {
+            int baseValueOfCapturedPiece = getBaseValue(capture.getNextBitboard());
+            totalScore += (baseValueOfCapturedPiece * -1);
+            bestCapture = Math.max(Math.abs(bestCapture), Math.abs(baseValueOfCapturedPiece));
+        }
+        totalScore += bestCapture;
+
+
         //adds or removes based on distance and piece value
-        for (int i = 0; i < 12; i++) {
+        /*for (int i = 0; i < 12; i++) {
             int baseValue = switch (i) {
                 case 0 -> -5;
                 case 1, 2 -> -3;
@@ -72,6 +108,7 @@ public class BoardMethods {
                 default -> 0;
             };
             double negativeOrPositive = baseValue > 0 ? 1 : -1;
+
             //runs through each bitboard, checks if there is a piece there
             for (int j = 0; j < bitboards[i].length; j++) {
                 if (bitboards[i][j] == 1) {
@@ -96,15 +133,14 @@ public class BoardMethods {
                     }
                 }
             }
-        }
+        }*/
 
         return (double) Math.round(totalScore * 10) / 10;
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
-    private static int getBaseValue(Move currentMove) {
-
-        return switch (currentMove.getCurrentBitboard()) {
+    private static int getBaseValue(int bitboard) {
+        return switch (bitboard) {
             case 0 -> -5;
             case 1, 2 -> -3;
             case 3 -> -9;
