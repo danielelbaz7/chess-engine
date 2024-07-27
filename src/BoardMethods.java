@@ -39,11 +39,10 @@ public class BoardMethods {
             if (ValidMoves.allAvailableMoves(bitboards, kingLocations, sideToCheck).isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;
-                    return totalScore;
                 } else {
                     totalScore = 1000;
-                    return totalScore;
                 }
+                return totalScore;
             }
         }
         //adds or removes based on distance and piece value
@@ -83,10 +82,12 @@ public class BoardMethods {
                             } else {
                                 //if the other piece can attack our tested piece, add to the total score the basevalue
                                 // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (ValidMoves.possibleMoveFinderAllPieces(possibleMove.getMoveLocation(), bitboards, i).containsMove(j)) {
-                                    totalScore += (baseValue - getBaseValue(possibleMove.getNextBitboard(), bitboards)) * -1;
-                                } else {
-                                    totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
+                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                //if the move is the other king
+                                if(possibleMove.getNextBitboard() == (10 - ((i/6)*6))) {
+                                    if(!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i/6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
+                                        totalScore += 10 * (((i/6) == 1) ? 1 : -1);
+                                    }
                                 }
                             }
                         }
