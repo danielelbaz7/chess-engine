@@ -1,5 +1,3 @@
-import java.util.HashSet;
-
 //used to look at and check a Board object
 public class BoardMethods {
 
@@ -48,7 +46,6 @@ public class BoardMethods {
             }
         }
         //adds or removes based on distance and piece value
-        HashSet<Integer> piecesAlreadyAtRisk = new HashSet<>();
         for (int i = 0; i < 12; i++) {
             int baseValue = switch (i) {
                 case 0 -> -5;
@@ -72,49 +69,42 @@ public class BoardMethods {
                     totalScore += (baseValue / (centerDistance * heightDistance)) / 4;*/
 
                     totalScore += baseValue;
-                    //special rules for kings
-                    if(i == 4 || i == 10) {
-                        if (i == 4) {
-                            totalScore += ((j / 10) - 2) * 0.50;
-                        } else {
-                            totalScore += ((j / 10) - 9) * 0.50;
-                        }
-                        for(Move possibleKingMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
-                            int nextBoard = possibleKingMove.getNextBitboard();
-                            int nextMove = possibleKingMove.getMoveLocation();
-                            if (nextBoard == -1) {
+
+                    if (i == 4) {
+                        totalScore += ((j / 10) - 2) * 0.50;
+                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
+                            //if it is not a capture add 0.05 for every possible moves
+                            if (possibleMove.getNextBitboard() == -1) {
                                 totalScore += negativeOrPositive * 0.05;
                             } else {
-                                //if the other piece can attack our tested piece, add to the total score the basevalue
-                                // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (i / 6 != sideToCheck) {
-                                    if (!piecesAlreadyAtRisk.contains(nextMove)) {
-                                        totalScore += getBaseValue(nextMove, bitboards) * -1;
-                                    }
-                                    piecesAlreadyAtRisk.add(nextMove);
-                                }
+                                //add to total score the value of the other piece
+                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
                             }
                         }
-                    }
-                    for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
-                        //if it is not a capture add 0.05 for every possible moves
-                        int nextBoard = possibleMove.getNextBitboard();
-                        int nextMove = possibleMove.getMoveLocation();
-                        if (nextBoard == -1) {
-                            totalScore += negativeOrPositive * 0.05;
-                        } else {
-                            //if the other piece can attack our tested piece, add to the total score the basevalue
-                            // of our piece minus the basevalue of the other piece to determine the value of the attack
-                            if(i/6 != sideToCheck) {
-                                if(!piecesAlreadyAtRisk.contains(nextMove)) {
-                                    totalScore += getBaseValue(nextMove, bitboards) * -1;
-                                }
-                                piecesAlreadyAtRisk.add(nextMove);
+                    } else if (i == 10) {
+                        totalScore += ((j / 10) - 9) * 0.50;
+                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
+                            //if it is not a capture add 0.05 for every possible moves
+                            if (possibleMove.getNextBitboard() == -1) {
+                                totalScore += negativeOrPositive * 0.05;
+                            } else {
+                                //add to total score the value of the other piece
+                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
                             }
-                            //if the move is the other king
-                            if(nextBoard == (10 - ((i/6)*6))) {
-                                if(!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i/6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
-                                    totalScore += 10 * (((i / 6) == 1) ? 1 : -1);
+                        }
+                    } else {
+                        for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
+                            //if it is not a capture add 0.05 for every possible moves
+                            if (possibleMove.getNextBitboard() == -1) {
+                                totalScore += negativeOrPositive * 0.05;
+                            } else {
+                                //add to total score the value of the other piece
+                                totalScore += getBaseValue(possibleMove.getNextBitboard(), bitboards) * -1;
+                                //if the move is the other king
+                                if(possibleMove.getNextBitboard() == (10 - ((i/6)*6))) {
+                                    if(!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i/6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
+                                        totalScore += 10 * (((i/6) == 1) ? 1 : -1);
+                                    }
                                 }
                             }
                         }
@@ -148,5 +138,4 @@ public class BoardMethods {
             default -> 0;
         };
     }
-
-}
+    }
