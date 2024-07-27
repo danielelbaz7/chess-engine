@@ -3,16 +3,16 @@ public class ArtificialIntelligence{
     static int countOfOps = 0;
 
     //locates best move based on tree of moves
-    public static MoveAndEval<Move, Double> findBestMove(Board b, int depth, double alpha, double beta, boolean ourTurn) {
-        double evaluation = BoardMethods.evaluateBoard(b.pieceBoards, b.kingLocations, ourTurn);
+    public static MoveAndEval<Move, Double> findBestMove(Board b, int depth, double alpha, double beta, boolean whiteTurn) {
+        double evaluation = BoardMethods.evaluateBoard(b.pieceBoards, b.kingLocations, whiteTurn);
         if(depth == 0 || Math.abs(evaluation) == 1000) {
             return new MoveAndEval<>(null, evaluation);
         }
 
-        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, 1);
-        Move bestMove = allPossibleMoves.toArray(new Move[0])[0];
+        MoveSet allPossibleMoves = ValidMoves.allAvailableMoves(b.pieceBoards, b.kingLocations, whiteTurn ? 1 : 0);
+        Move bestMove = null;
 
-        if(ourTurn) {
+        if(whiteTurn) {
             double maxEval = Integer.MIN_VALUE;
             for(Move move : allPossibleMoves) {
                 countOfOps++;

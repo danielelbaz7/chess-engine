@@ -33,10 +33,14 @@ public class BoardMethods {
     //evaluates which side is winning and by how much
     public static double evaluateBoard(int[][] bitboards, int[] kingLocations, boolean isWhiteTurn) {
         //sets score to 1000 or -1000 if in check mate
+        boolean[] kingsChecked = {false, false};
         double totalScore = 0;
         int sideToCheck = isWhiteTurn ? 1 : 0;
+        int otherSide = isWhiteTurn ? 0 : 1;
+        MoveSet availableMovesForSideToMove = ValidMoves.allAvailableMoves(bitboards, kingLocations, sideToCheck);
+        MoveSet availableMovesForSideNotMoving = ValidMoves.allAvailableMoves(bitboards, kingLocations, otherSide);
         if (BoardMethods.isKingChecked(bitboards, kingLocations, sideToCheck)) {
-            if (ValidMoves.allAvailableMoves(bitboards, kingLocations, sideToCheck).isEmpty()) {
+            if (availableMovesForSideToMove.isEmpty()) {
                 if (sideToCheck == 1) {
                     totalScore = -1000;
                     return totalScore;
@@ -51,6 +55,7 @@ public class BoardMethods {
                 } else {
                     totalScore += 10;
                 }
+                kingsChecked[sideToCheck] = true;
             }
         }
         //adds or removes based on distance and piece value
@@ -83,7 +88,9 @@ public class BoardMethods {
                                 totalScore += (negativeOrPositive * 0.05);
                             } else {
                                 //if we are attacking a piece, add its value to our score
-                                totalScore += (getBaseValue(possibleMove.getMoveLocation(), bitboards) * -1);
+                                if(sideToCheck == (i/6)) {
+                                    totalScore += (getBaseValue(possibleMove) * -1);
+                                }
                             }
                         }
                     }
@@ -95,16 +102,9 @@ public class BoardMethods {
     }
 
     //takes a location and set of boards to find the current bitboard of a piece
-    private static int getBaseValue(int location, int[][] bitboards) {
-        int boardWithPiece = -1;
+    private static int getBaseValue(Move currentMove) {
 
-        for (int i = 0; i < 12; i++) {
-            if (bitboards[i][location] == 1) {
-                boardWithPiece = i;
-            }
-        }
-
-        return switch (boardWithPiece) {
+        return switch (currentMove.getCurrentBitboard()) {
             case 0 -> -5;
             case 1, 2 -> -3;
             case 3 -> -9;

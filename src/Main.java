@@ -6,7 +6,7 @@ public class Main {
         ChessGUI chessGUI = new ChessGUI(gameBoard);
         System.out.println(System.currentTimeMillis());
         System.out.println(ArtificialIntelligence.countOfOps);
-        System.out.println(ArtificialIntelligence.findBestMove(gameBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameBoard.whiteTurn).getMove());
+        System.out.println(ArtificialIntelligence.findBestMove(gameBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameBoard.whiteTurn).getEval());
         System.out.println(ArtificialIntelligence.countOfOps);
         System.out.println(System.currentTimeMillis());
     }

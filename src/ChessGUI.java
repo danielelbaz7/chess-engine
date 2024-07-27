@@ -1,3 +1,4 @@
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -174,9 +175,10 @@ public class ChessGUI {
                         public void run() {
                             System.out.println(Thread.currentThread().threadId() + "!");
                             Board b = new Board(board);
-                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
-                            bestMove.setText("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
-                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "</html>");
+                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+                            System.out.println(bestMoveAndEval.getEval());
+                            bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8)+1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
+                                    "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8)+1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "</html>");
                         }
                     });
                     runningAIThread.start();
