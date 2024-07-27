@@ -38,7 +38,6 @@ public class BoardMethods {
         int sideToCheck = isWhiteTurn ? 1 : 0;
         int otherSide = isWhiteTurn ? 0 : 1;
         MoveSet availableMovesForSideToMove = ValidMoves.allAvailableMoves(bitboards, kingLocations, sideToCheck);
-        MoveSet availableMovesForSideNotMoving = ValidMoves.allAvailableMoves(bitboards, kingLocations, otherSide);
         if (BoardMethods.isKingChecked(bitboards, kingLocations, sideToCheck)) {
             if (availableMovesForSideToMove.isEmpty()) {
                 if (sideToCheck == 1) {
@@ -59,7 +58,7 @@ public class BoardMethods {
             }
         }
 
-        for(Move possibleCurrentSideMove : availableMovesForSideToMove) {
+        /*for(Move possibleCurrentSideMove : availableMovesForSideToMove) {
             int currentBitboard = possibleCurrentSideMove.getCurrentBitboard();
             totalScore += getBaseValue(currentBitboard);
             if(currentBitboard == 10) {
