@@ -211,11 +211,13 @@ public class GameplayController implements MouseListener {
             board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
             if (Math.abs(board.evaluationValue) != 1000) {
                 chessGUI.evaluationValueLabel.setText(String.valueOf(board.evaluationValue));
+
             } else {
                 switch ((int) board.evaluationValue) {
                     case -1000 -> chessGUI.evaluationValueLabel.setText("-M");
                     case 1000 -> chessGUI.evaluationValueLabel.setText("M");
                 }
+                allowMovement = false;
             }
             int sideToCheck = board.whiteTurn ? 1 : 0;
             int otherSide = sideToCheck == 1 ? 0 : 1;
@@ -223,9 +225,12 @@ public class GameplayController implements MouseListener {
                 board.kingsChecked[otherSide] = false;
             } else if (BoardMethods.isKingChecked(board.pieceBoards, board.kingLocations, sideToCheck)) {
                 board.kingsChecked[sideToCheck] = true;
-                //game over is printed outside the method as isCheckMated is used in simulation as well
+                //disables game and sets king color to blue
                 if (ValidMoves.allAvailableMoves(board.pieceBoards, board.kingLocations, sideToCheck).isEmpty()) {
-                    System.out.println("GAME OVER");
+                    allowMovement = false;
+                    chessGUI.evaluationValueLabel.setVisible(true);
+                    chessGUI.JLabelCollection[Conv.to64From120(board.kingLocations[sideToCheck])].setBackground(Color.CYAN);
+                    chessGUI.placeBoardsAgain();
                 }
             }
         }
