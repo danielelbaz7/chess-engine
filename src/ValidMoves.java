@@ -403,6 +403,4 @@ public class ValidMoves {
         }
         return possibleMovesForSide;
     }
-
 }
-

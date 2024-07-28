@@ -16,6 +16,4 @@ public class MoveAndEval<Move, Double> {
         this.eval = eval;
     }
 
-
-
 }
