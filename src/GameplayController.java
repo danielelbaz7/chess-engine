@@ -1,29 +1,37 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 public class GameplayController implements MouseListener {
 
     int selectedPiece = -1;
-    HashMap<Integer, Integer> possibleMovesForSelectedPiece = null;
+    MoveSet possibleMovesForSelectedPiece = null;
     int selectedPieceType = -1;
     Board board;
-    ValidMoves vm;
     ChessGUI chessGUI;
+
+    public static boolean allowMovement = true;
+
+    Thread pieceSelectThread;
+    Thread deselectPieceThread;
+    Thread movingPieceThread;
 
     public GameplayController(ChessGUI c) {
         this.chessGUI = c;
         board = chessGUI.board;
-        vm = new ValidMoves(board);
     }
 
     //makes the selected square gray and the possible moves red
     private void setPieceSelectedGUI(int rowpass, int colpass) {
         selectedPiece = (Conv.to120RC(rowpass, colpass));
-        possibleMovesForSelectedPiece = vm.possibleMoveFinderAllPieces(selectedPiece, board.pieceBoards);
+        int pieceType = -1;
+        for (int i = 0; i < 12; i++) {
+            if (board.pieceBoards[i][selectedPiece] == 1) {
+                pieceType = i;
+            }
+        }
+        int[][] bitboards = board.pieceBoards;
+        possibleMovesForSelectedPiece = ValidMoves.possibleMoveFinderAllPieces(selectedPiece, bitboards, pieceType);
         //sets the current piece type
         for (int i = 0; i < 12; i++) {
             if (board.pieceBoards[i][Conv.to120RC(rowpass, colpass)] == 1) {
@@ -32,51 +40,67 @@ public class GameplayController implements MouseListener {
         }
         int otherSide = selectedPieceType > 5 ? 0 : 1;
 
-        //iterates through all possible moves and put moves that check into a hashset to avoid concurrent modification exception
-        HashMap<Integer, Integer> movesToRemove = new HashMap<>();
-        for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
-            System.out.println(selectedPiece + ": " + selectedPieceType + ", " + possibleMove.getKey() + ": " + possibleMove.getValue());
-            if (vm.willThisMovePutOurKingInCheck(selectedPiece, selectedPieceType, possibleMove.getKey(), possibleMove.getValue())) {
-                movesToRemove.put(possibleMove.getKey(), possibleMove.getValue());
+        //iterates through all possible moves and put moves that check into a hashmap to avoid concurrent modification exception
+        MoveSet movesToRemove = new MoveSet();
+        for (Move possibleMove : possibleMovesForSelectedPiece) {
+            if (ValidMoves.willThisMovePutOurKingInCheck(board.pieceBoards, board.kingLocations, possibleMove)) {
+                movesToRemove.add(new Move(selectedPiece, selectedPieceType, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
             }
         }
 
-        for (Map.Entry<Integer, Integer> moveToRemove : movesToRemove.entrySet()) {
-            possibleMovesForSelectedPiece.remove(moveToRemove.getKey());
+        for (Move moveToRemove : movesToRemove) {
+            possibleMovesForSelectedPiece.remove(moveToRemove.getMoveLocation());
         }
 
         //removes king from possible moves if in check
-        if (possibleMovesForSelectedPiece.containsKey(board.kingLocations[otherSide])) {
+        if (possibleMovesForSelectedPiece.containsMove(board.kingLocations[otherSide])) {
             possibleMovesForSelectedPiece.remove(board.kingLocations[otherSide]);
             board.kingsChecked[0] = true;
         }
 
         if ((chessGUI.isPieceSelected() == 0)) {
             chessGUI.JLabelCollection[(rowpass * 8) + colpass].setBackground(Color.DARK_GRAY);
-            chessGUI.setPieceSelectedTrue(rowpass, colpass);
+            if (pieceSelectThread == null || !pieceSelectThread.isAlive()) {
+                pieceSelectThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        chessGUI.setPieceSelectedTrue(rowpass, colpass);
+                    }
+                });
+                pieceSelectThread.start();
+            }
             //handles showing the possible moves
-            for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForSelectedPiece.entrySet()) {
+            for (Move possibleMove : possibleMovesForSelectedPiece) {
                 //checks for capture
-                if (possibleMove.getValue() != -1) {
-                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.GREEN);
+                if (possibleMove.getNextBitboard() != -1) {
+                    chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getMoveLocation())].setBackground(Color.GREEN);
                     continue;
                 }
-                chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getKey())].setBackground(Color.RED);
+                chessGUI.JLabelCollection[Conv.to64From120(possibleMove.getMoveLocation())].setBackground(Color.RED);
             }
         }
 
         //deselects and sets colors back
         else if ((chessGUI.getPointSelected() - colpass) - (rowpass * 8) == 0) {
-            selectedPiece = -1;
-            selectedPieceType = -1;
-            setSquareToOriginalColor(rowpass, colpass);
-            for (Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
-                //checks for capture
-                setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
-                        Conv.toRC120(possibleMoveToRemove.getKey())[1]);
+            if (deselectPieceThread == null || !deselectPieceThread.isAlive()) {
+                deselectPieceThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        selectedPiece = -1;
+                        selectedPieceType = -1;
+                        setSquareToOriginalColor(rowpass, colpass);
+                        for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
+                            //checks for capture
+                            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
+                                    Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
+                        }
+                        chessGUI.setPieceSelectedFalse();
+                        possibleMovesForSelectedPiece = null;
+                    }
+                });
+                deselectPieceThread.start();
             }
-            chessGUI.setPieceSelectedFalse();
-            possibleMovesForSelectedPiece = null;
+
         }
 
         chessGUI.placeBoardsAgain();
@@ -105,13 +129,13 @@ public class GameplayController implements MouseListener {
             return bitboards;
         }
         //searches through all possible moves for selected piece
-        for (Map.Entry<Integer, Integer> currentPossibleMove : possibleMovesForSelectedPiece.entrySet()) {
+        for (Move currentPossibleMove : possibleMovesForSelectedPiece) {
             //checks for capture
-            if (currentPossibleMove.getValue() != -1) {
+            if (currentPossibleMove.getNextBitboard() != -1) {
                 capturingMove = true;
             }
             //if the player clicks on a possible move, indicate that with the boolean
-            if (currentPossibleMove.getKey() == currentSquare) {
+            if (currentPossibleMove.getMoveLocation() == currentSquare) {
                 onPossibleSquare = true;
                 break;
             }
@@ -149,11 +173,11 @@ public class GameplayController implements MouseListener {
         bitboards[selectedPieceType][selectedPiece] = 0;
 
         setSquareToOriginalColor(Conv.toRC120(selectedPiece)[0], Conv.toRC120(selectedPiece)[1]);
-        for (Map.Entry<Integer, Integer> possibleMoveToRemove : possibleMovesForSelectedPiece.entrySet()) {
+        for (Move possibleMoveToRemove : possibleMovesForSelectedPiece) {
             //checks for capture
             //resets square of possible highlighted move
-            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getKey())[0],
-                    Conv.toRC120(possibleMoveToRemove.getKey())[1]);
+            setSquareToOriginalColor(Conv.toRC120(possibleMoveToRemove.getMoveLocation())[0],
+                    Conv.toRC120(possibleMoveToRemove.getMoveLocation())[1]);
         }
 
         chessGUI.JLabelCollection[Conv.to64From120(currentSquare)].setIcon(chessGUI.JLabelCollection[Conv.to64From120(selectedPiece)].getIcon());
@@ -173,32 +197,40 @@ public class GameplayController implements MouseListener {
     //sets the selected square dark gray if there is a playable piece there
     @Override
     public void mousePressed(MouseEvent e) {
+        if (!allowMovement) {
+            return;
+        }
         int row = (int) (((double) e.getY()) / ((double) ChessGUI.dimension / 16) + 0.5);
         int col = e.getX() / (ChessGUI.dimension / 16);
-        if (board.isThereAPieceThere(row, col)) {
+        if (BoardMethods.isThereAPieceThere(board, row, col)) {
             setPieceSelectedGUI(row, col);
         } else {
             //controls checks
             board.pieceBoards = movePiece(row, col, board.pieceBoards);
             //resets to find new evaluation value
-            board.evaluationValue = board.evaluateBoard(board.pieceBoards, board.whiteTurn);
+            board.evaluationValue = BoardMethods.evaluateBoard(board.pieceBoards, board.kingLocations, board.whiteTurn);
             if (Math.abs(board.evaluationValue) != 1000) {
-                chessGUI.evaluationValuePanel.setText(String.valueOf(board.evaluationValue));
+                chessGUI.evaluationValueLabel.setText(String.valueOf(board.evaluationValue));
+
             } else {
                 switch ((int) board.evaluationValue) {
-                    case -1000 -> chessGUI.evaluationValuePanel.setText("-M");
-                    case 1000 -> chessGUI.evaluationValuePanel.setText("M");
+                    case -1000 -> chessGUI.evaluationValueLabel.setText("-M");
+                    case 1000 -> chessGUI.evaluationValueLabel.setText("M");
                 }
+                allowMovement = false;
             }
             int sideToCheck = board.whiteTurn ? 1 : 0;
             int otherSide = sideToCheck == 1 ? 0 : 1;
             if (board.kingsChecked[otherSide]) {
                 board.kingsChecked[otherSide] = false;
-            } else if (board.isKingChecked(board.pieceBoards, sideToCheck, board.kingLocations)) {
+            } else if (BoardMethods.isKingChecked(board.pieceBoards, board.kingLocations, sideToCheck)) {
                 board.kingsChecked[sideToCheck] = true;
-                //game over is printed outside the method as isCheckMated is used in simulation as well
-                if (vm.allAvailableMoves(board.pieceBoards, sideToCheck).isEmpty()) {
-                    System.out.println("GAME OVER");
+                //disables game and sets king color to blue
+                if (ValidMoves.allAvailableMoves(board.pieceBoards, board.kingLocations, sideToCheck).isEmpty()) {
+                    allowMovement = false;
+                    chessGUI.evaluationValueLabel.setVisible(true);
+                    chessGUI.JLabelCollection[Conv.to64From120(board.kingLocations[sideToCheck])].setBackground(Color.CYAN);
+                    chessGUI.placeBoardsAgain();
                 }
             }
         }

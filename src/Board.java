@@ -1,7 +1,3 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 public class Board {
 
     //declares white pieces
@@ -18,7 +14,6 @@ public class Board {
     boolean whiteTurn = true;
     boolean[] kingsChecked = {false, false};
     int[] kingLocations = {-1, -1};
-    final ValidMoves vm = new ValidMoves(this);
 
     //creates a default board template used to generate the bitboards
     private static final String[][] boardTemplate = {
@@ -38,11 +33,17 @@ public class Board {
 
     public Board() {
         this.generateBoards();
-        evaluationValue = evaluateBoard(pieceBoards, whiteTurn);
+        evaluationValue = BoardMethods.evaluateBoard(pieceBoards, kingLocations, whiteTurn);
+    }
+
+    public Board(Board b) {
+        this.pieceBoards = b.pieceBoards;
+        this.whiteTurn = b.whiteTurn;
+        evaluationValue = BoardMethods.evaluateBoard(pieceBoards, kingLocations, whiteTurn);
     }
 
     //initializes the bitboards
-    private void createBitboards(int[][] bitboards) {
+    private void createBitboards() {
         //runs the creator for each individual board
         for (int i = 0; i < 12; i++) {
             //logs the current board
@@ -120,144 +121,52 @@ public class Board {
             for (int k = 0; k < 120; k++) {
                 currentBoard[k] = Integer.parseInt(baseLong.substring(k, k + 1));
             }
-            bitboards[i] = currentBoard;
+            pieceBoards[i] = currentBoard;
         }
     }
 
     //sets the boardlist to the newly generated boards and prints the board to the console
     public void generateBoards() {
-        createBitboards(pieceBoards);
-        for (int i = 0; i < 120; i++) {
-            if (i % 10 == 0) {
-                System.out.println();
-            }
-            System.out.print(pieceBoards[5][i]);
-        }
-        System.out.println();
+        createBitboards();
     }
 
-    //gui usage
-    public boolean isThereAPieceThere(int rowpass, int colpass) {
-        int startingIndex = 0;
-        if (Boolean.TRUE.equals(whiteTurn)) {
-            startingIndex = 6;
+
+
+    //performs a move
+    public int[][] makeMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 0;
+        if(move.getNextBitboard() != -1) {
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 0;
         }
-        int pieceIndex = (((rowpass * 8) + 20) + (colpass + 1)) + (rowpass * 2);
-        for (int i = startingIndex; i < startingIndex + 6; i++) {
-            if (pieceBoards[i][pieceIndex] == 1) {
-                return true;
-            }
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 1;
+
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getMoveLocation();
         }
-        return false;
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getMoveLocation();
+        }
+
+        return pieceBoards;
     }
 
-    //moved to board as it made more sense, checks the current board value
-    //no longer static to remove static global state
-
-    public boolean isKingChecked(int[][] bitboards, int side, int[] kingLocations) {
-        int otherSide = side == 1 ? 0 : 1;
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
-        //looks through enemy pieces and finds their possible moves
-        for (int i = otherSide * 6; i < otherSide * 6 + 6; i++) {
-            for (int j = 0; j < bitboards[0].length; j++) {
-                if (bitboards[i][j] == 1) {
-                    totalPossibleMoves.putAll(vm.possibleMoveFinderAllPieces(j, bitboards));
-                }
-            }
+    public int[][] undoMove(Move move) {
+        pieceBoards[move.getCurrentBitboard()][move.getCurrentLocation()] = 1;
+        if(move.getNextBitboard() != -1) {
+            pieceBoards[move.getNextBitboard()][move.getMoveLocation()] = 1;
         }
-        return totalPossibleMoves.containsKey(kingLocations[side]);
-    }
+        pieceBoards[move.getCurrentBitboard()][move.getMoveLocation()] = 0;
 
-    //evaluates which side is winning and by how much
-    public double evaluateBoard(int[][] bitboards, boolean isWhiteTurn) {
-        //sets score to 1000 or -1000 if in check mate
-        double totalScore = 0;
-        int sideToCheck = isWhiteTurn ? 1 : 0;
-        if (isKingChecked(pieceBoards, sideToCheck, kingLocations)) {
-            if (vm.allAvailableMoves(pieceBoards, sideToCheck).isEmpty()) {
-                if (sideToCheck == 1) {
-                    totalScore = -1000;
-                    return totalScore;
-                } else {
-                    totalScore = 1000;
-                    return totalScore;
-                }
-            }
+        //simulates king move
+        if(move.getCurrentBitboard() == 4) {
+            kingLocations[0] = move.getCurrentLocation();
         }
-        //adds or removes based on distance and piece value
-        for (int i = 0; i < 12; i++) {
-            int baseValue = switch (i) {
-                case 0 -> -5;
-                case 1, 2 -> -3;
-                case 3 -> -9;
-                case 5 -> -1;
-                case 6 -> 5;
-                case 7, 8 -> 3;
-                case 9 -> 9;
-                case 11 -> 1;
-                default -> 0;
-            };
-            double negativeOrPositive = baseValue > 0 ? 1 : -1;
-            //runs through each bitboard, checks if there is a piece there
-            for (int j = 0; j < bitboards[i].length; j++) {
-                if (bitboards[i][j] == 1) {
-                    //if there is a piece there, find the value and find its distance from the center and multiply that by the base value
-
-                    /*double centerDistance = Math.abs(Conv.to64From120(j) % 8 - 3.5);
-                    double heightDistance = Math.abs(Conv.to64From120(j) / 8 - 3.5);
-                    totalScore += (baseValue / (centerDistance * heightDistance)) / 4;*/
-
-                    totalScore += baseValue;
-
-                    if (i == 4) {
-                        totalScore += ((j / 10) - 2) * 0.50;
-                    } else if (i == 10) {
-                        totalScore += ((j / 10) - 9) * 0.50;
-                    } else {
-                        for (Map.Entry<Integer, Integer> possibleMove : vm.possibleMoveFinderAllPieces(j, bitboards).entrySet()) {
-                            //if it is not a capture add 0.05 for every possible moves
-                            if (possibleMove.getValue() == -1) {
-                                totalScore += negativeOrPositive * 0.05;
-                            } else {
-                                //if the other piece can attack our tested piece, add to the total score the basevalue
-                                // of our piece minus the basevalue of the other piece to determine the value of the attack
-                                if (vm.possibleMoveFinderAllPieces(possibleMove.getKey(), bitboards).containsKey(j)) {
-                                    System.out.println(possibleMove.getKey() + "IS THE PIECE WE ARE ATTACKING");
-                                    totalScore += (baseValue - getBaseValue(possibleMove.getValue(), bitboards)) * -1;
-                                } else {
-                                    totalScore += (getBaseValue(possibleMove.getKey(), bitboards) * -1);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        else if(move.getCurrentBitboard() == 10) {
+            kingLocations[1] = move.getCurrentLocation();
         }
 
-        return (double) Math.round(totalScore * 10) / 10;
-    }
-
-    //takes a location and set of boards to find the current bitboard of a piece
-    private static int getBaseValue(int location, int[][] bitboards) {
-        int boardWithPiece = -1;
-
-        for (int i = 0; i < 12; i++) {
-            if (bitboards[i][location] == 1) {
-                boardWithPiece = i;
-            }
-        }
-
-        return switch (boardWithPiece) {
-            case 0 -> -5;
-            case 1, 2 -> -3;
-            case 3 -> -9;
-            case 5 -> -1;
-            case 6 -> 5;
-            case 7, 8 -> 3;
-            case 9 -> 9;
-            case 11 -> 1;
-            default -> 0;
-        };
+        return pieceBoards;
     }
 
     public static String[][] getBoardTemplate() {
