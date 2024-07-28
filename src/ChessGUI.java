@@ -20,6 +20,7 @@ public class ChessGUI {
     String[][] mainBoard;
     MoveAndEval<Move, Double> bestMoveAndEval;
     Thread runningAIThread;
+    private int AIDepth;
 
     public JLabel[] JLabelCollection;
     int[] pieceSelectedAndCoordinate = new int[2];
@@ -27,12 +28,13 @@ public class ChessGUI {
             Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 
     //sets the board to the board passed and creates the chess gui
-    public ChessGUI(Board b) {
+    public ChessGUI(Board b, int depth) {
         this.board = b;
+        AIDepth = depth;
         mainBoard = Board.getBoardTemplate();
         Board fakeBoard = new Board(board);
         GameplayController.allowMovement = false;
-        bestMoveAndEval = ArtificialIntelligence.findBestMove(fakeBoard, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+        bestMoveAndEval = ArtificialIntelligence.findBestMove(fakeBoard, AIDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
         GameplayController.allowMovement = true;
         evaluationValueLabel = new JLabel(String.valueOf(board.evaluationValue));
         bestMove = new JLabel("<html>" + (Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation()) + 1) % 8 + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
@@ -180,7 +182,7 @@ public class ChessGUI {
                                     "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) +
                                     "<br>" + "↻" + "</html>");
                             Board b = new Board(board);
-                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
+                            bestMoveAndEval = ArtificialIntelligence.findBestMove(b, AIDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
                             System.out.println(bestMoveAndEval.getEval());
                             bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
                                     "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "<br>" + " " + "</html>");

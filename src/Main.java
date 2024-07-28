@@ -3,7 +3,7 @@ public class Main {
 
         //generates a board and a gui based on it
         Board gameBoard = new Board();
-        ChessGUI chessGUI = new ChessGUI(gameBoard);
+        ChessGUI chessGUI = new ChessGUI(gameBoard, 5);
 
     }
 }
