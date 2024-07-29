@@ -75,7 +75,7 @@ public class BoardMethods {
                         for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getNextBitboard() == -1) {
-                                totalScore += negativeOrPositive * 0.05;
+                                totalScore += negativeOrPositive * 0.08;
                             } else {
                                 //add to total score the value of the other piece
                                 totalScore += getBaseValue(possibleMove.getNextBitboard()) * -1;
@@ -86,7 +86,7 @@ public class BoardMethods {
                         for (Move possibleMove : ValidMoves.possibleMoveFinderAllPieces(j, bitboards, i)) {
                             //if it is not a capture add 0.05 for every possible moves
                             if (possibleMove.getNextBitboard() == -1) {
-                                totalScore += negativeOrPositive * 0.05;
+                                totalScore += negativeOrPositive * 0.08;
                             } else {
                                 //add to total score the value of the other piece
                                 totalScore += getBaseValue(possibleMove.getNextBitboard()) * -1;
@@ -104,7 +104,7 @@ public class BoardMethods {
                                 //if the move is the other king
                                 if (possibleMove.getNextBitboard() == (10 - ((i / 6) * 6))) {
                                     if (!ValidMoves.allAvailableMoves(bitboards, kingLocations, ((i / 6 == 1) ? 0 : 1)).containsMove(possibleMove.getCurrentLocation())) {
-                                        totalScore += 10 * (((i / 6) == 1) ? 1 : -1);
+                                        totalScore += 3.5 * (((i / 6) == 1) ? 1 : -1);
                                     }
                                 }
                             }
