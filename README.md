@@ -1,1 +1,1 @@
-Chess game with AI functionality to provide the best move for or play against the user.
+Chess game with AI functionality to provide the best move for or against the user.
