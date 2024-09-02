@@ -20,20 +20,8 @@ public class ValidMoves {
     private static final int[] BLACK_PAWN_OPERATIONS = {10, 20, 9, 11};
     private static final int[] WHITE_PAWN_OPERATIONS = {-10, -20, -9, -11};
 
-    private final Board BOARD;
-
-    public ValidMoves(Board b) {
-        this.BOARD = b;
-    }
-
-    public HashMap<Integer, Integer> possibleMoveFinderAllPieces(int location, int[][] bitboards) {
-        HashMap<Integer, Integer> possibleMoves = new HashMap<>();
-        int pieceType = -1;
-        for (int i = 0; i < 12; i++) {
-            if (bitboards[i][location] == 1) {
-                pieceType = i;
-            }
-        }
+    public static MoveSet possibleMoveFinderAllPieces(int location, int[][] bitboards, int pieceType) {
+        MoveSet possibleMoves = new MoveSet();
         //checks what piecetype to determine what moves to find
         possibleMoves = switch (pieceType) {
             case 0 -> possibleRookMoves(location, 0, bitboards);
@@ -55,8 +43,9 @@ public class ValidMoves {
     }
 
     //returns list of possible moves for a king
-    private HashMap<Integer, Integer> possibleKingMoves(int location, int side, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
+    private static MoveSet possibleKingMoves(int location, int side, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
+        int currentBitboard = side == 0 ? 4 : 10;
         //runs through each possible operation and checks for validity
         for (int op : KING_OPERATIONS) {
             boolean cancelOperation = false;
@@ -75,22 +64,23 @@ public class ValidMoves {
                         break;
                     } else {
                         //adds the possible move's value as the board of the piece it captures
-                        totalPossibleMoves.put(location + op, i);
+                        totalPossibleMoves.add(new Move(location, currentBitboard, location + op, i));
                         cancelOperation = true;
                         break;
                     }
                 }
             }
             if (Boolean.FALSE.equals(cancelOperation)) {
-                totalPossibleMoves.put(location + op, -1);
+                totalPossibleMoves.add(new Move(location, currentBitboard, location + op, -1));
             }
         }
         return totalPossibleMoves;
     }
 
     //returns a list of possible knight moves
-    private HashMap<Integer, Integer> possibleKnightMoves(int location, int side, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
+    private static MoveSet possibleKnightMoves(int location, int side, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
+        int currentBitboard = side == 0 ? 1 : 7;
         //runs through each possible operation and checks for validity
         for (int op : KNIGHT_OPERATIONS) {
             boolean cancelOperation = false;
@@ -109,14 +99,14 @@ public class ValidMoves {
                         break;
                     } else {
                         //adds the possible move's value as the board of the piece it captures
-                        totalPossibleMoves.put(location + op, i);
+                        totalPossibleMoves.add(new Move(location, currentBitboard, location + op, i));
                         cancelOperation = true;
                         break;
                     }
                 }
             }
             if (Boolean.FALSE.equals(cancelOperation)) {
-                totalPossibleMoves.put(location + op, -1);
+                totalPossibleMoves.add(new Move(location, currentBitboard, location + op, -1));
             }
         }
 
@@ -130,8 +120,9 @@ public class ValidMoves {
     }
 
     //returns a list of possible moves for a rook
-    private HashMap<Integer, Integer> possibleRookMoves(int location, int side, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
+    private static MoveSet possibleRookMoves(int location, int side, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
+        int currentBitboard = side == 0 ? 0 : 6;
         //iterates through the set of sets of rook ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of rook ops
@@ -149,14 +140,14 @@ public class ValidMoves {
                             if (k / 6 == side) {
                                 break;
                             } else {
-                                totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], k);
+                                totalPossibleMoves.add(new Move(location, currentBitboard, location + ROOK_OPERATIONS[j][i], k));
                                 break;
                             }
                         }
                     }
                 }
                 if (!cancelOperation) {
-                    totalPossibleMoves.put(location + ROOK_OPERATIONS[j][i], -1);
+                    totalPossibleMoves.add(new Move(location, currentBitboard, location + ROOK_OPERATIONS[j][i], -1));
                 } else {
                     break;
                 }
@@ -173,8 +164,9 @@ public class ValidMoves {
     }
 
     //returns a list of possible moves for a bishop
-    private HashMap<Integer, Integer> possibleBishopMoves(int location, int side, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>();
+    private static MoveSet possibleBishopMoves(int location, int side, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
+        int currentBitboard = side == 0 ? 2 : 8;
         //iterates through the set of sets of bishop ops
         for (int j = 0; j < 4; j++) {
             //iterates through each set of bishop ops
@@ -192,14 +184,14 @@ public class ValidMoves {
                             if (k / 6 == side) {
                                 break;
                             } else {
-                                totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], k);
+                                totalPossibleMoves.add(new Move(location, currentBitboard, location + BISHOP_OPERATIONS[j][i], k));
                                 break;
                             }
                         }
                     }
                 }
                 if (!cancelOperation) {
-                    totalPossibleMoves.put(location + BISHOP_OPERATIONS[j][i], -1);
+                    totalPossibleMoves.add(new Move(location, currentBitboard, location + BISHOP_OPERATIONS[j][i], -1));
                 } else {
                     break;
                 }
@@ -216,19 +208,25 @@ public class ValidMoves {
     }
 
     //returns a list of possible queen moves
-    private HashMap<Integer, Integer> possibleQueenMoves(int location, int side, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<>(possibleRookMoves(location, side, bitboards));
-        totalPossibleMoves.putAll(possibleBishopMoves(location, side, bitboards));
+    private static MoveSet possibleQueenMoves(int location, int side, int[][] bitboards) {
+        int currentBitboard = side == 1 ? 9 : 3;
+        MoveSet totalPossibleMoves = new MoveSet();
+        for(Move possibleMove : possibleRookMoves(location, side, bitboards)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
+        for(Move possibleMove : possibleBishopMoves(location, side, bitboards)) {
+            totalPossibleMoves.add(new Move(possibleMove.getCurrentLocation(), currentBitboard, possibleMove.getMoveLocation(), possibleMove.getNextBitboard()));
+        }
         return totalPossibleMoves;
     }
 
     //returns all possible moves for a black pawn
-    private HashMap<Integer, Integer> possibleBlackPawnMoves(int location, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<Integer, Integer>();
+    private static MoveSet possibleBlackPawnMoves(int location, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for (int op : BLACK_PAWN_OPERATIONS) {
             if (!(bitboards[0][location + op] == 2)) {
-                totalPossibleMoves.put(op + location, -1);
+                totalPossibleMoves.add(new Move(location, 5, op + location, -1));
             }
         }
 
@@ -259,7 +257,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[2]);
-                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[2], k);
+                    totalPossibleMoves.add(new Move(location, 5, location + BLACK_PAWN_OPERATIONS[2], k));
                 }
                 break;
             }
@@ -274,7 +272,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
-                    totalPossibleMoves.put(location + BLACK_PAWN_OPERATIONS[3], l);
+                    totalPossibleMoves.add(new Move(location, 5, location + BLACK_PAWN_OPERATIONS[3], l));
                 }
                 break;
             }
@@ -282,16 +280,16 @@ public class ValidMoves {
                 totalPossibleMoves.remove(location + BLACK_PAWN_OPERATIONS[3]);
             }
         }
-        return new HashMap<Integer, Integer>(totalPossibleMoves);
+        return new MoveSet(totalPossibleMoves);
     }
 
     //returns all possible moves for a white pawn
-    private HashMap<Integer, Integer> possibleWhitePawnMoves(int location, int[][] bitboards) {
-        HashMap<Integer, Integer> totalPossibleMoves = new HashMap<Integer, Integer>();
+    private static MoveSet possibleWhitePawnMoves(int location, int[][] bitboards) {
+        MoveSet totalPossibleMoves = new MoveSet();
         //adds all not out of bounds moves to possible moves with the rest of the method taking out invalid ones
         for (int op : WHITE_PAWN_OPERATIONS) {
             if (!(bitboards[0][location + op] == 2)) {
-                totalPossibleMoves.put(op + location, -1);
+                totalPossibleMoves.add(new Move(location, 11, op + location, -1));
             }
         }
 
@@ -322,7 +320,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[2]);
-                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[2], k);
+                    totalPossibleMoves.add(new Move(location, 11, location + WHITE_PAWN_OPERATIONS[2], k));
                 }
                 break;
             }
@@ -337,7 +335,7 @@ public class ValidMoves {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
                 } else {
                     totalPossibleMoves.remove(location + WHITE_PAWN_OPERATIONS[3]);
-                    totalPossibleMoves.put(location + WHITE_PAWN_OPERATIONS[3], l);
+                    totalPossibleMoves.add(new Move(location, 11, location + WHITE_PAWN_OPERATIONS[3], l));
                 }
                 break;
             }
@@ -346,55 +344,58 @@ public class ValidMoves {
             }
         }
 
-        return new HashMap<Integer, Integer>(totalPossibleMoves);
+        return new MoveSet(totalPossibleMoves);
     }
 
     //returns if the move will put the king in check
     //CLBNLB = currentLocation&Bitboard, nextLocation&Bitboard
-    public boolean willThisMovePutOurKingInCheck(int currentLocation, int currentBitboard, int nextLocation, int nextBitboard) {
+    public static boolean willThisMovePutOurKingInCheck(int[][] bitboards, int[] kingLocations, Move move) {
 
-        if (nextBitboard == -1) {
-            nextBitboard = currentBitboard;
-        }
+        int currentLocation = move.getCurrentLocation();
+        int currentBitboard = move.getCurrentBitboard();
+        int nextLocation = move.getMoveLocation();
+        int nextBitboard = move.getNextBitboard();
+
 
         //creates temporary bitboards to run isKingChecked on;
         int[][] tempBitboards = new int[12][120];
-        int[] tempKingLocations = Arrays.copyOf(BOARD.kingLocations, 2);
+        int[] tempKingLocations = Arrays.copyOf(kingLocations, 2);
 
 
         for (int i = 0; i < 12; i++) {
-            System.arraycopy(BOARD.pieceBoards[i], 0, tempBitboards[i], 0, 120);
+            System.arraycopy(bitboards[i], 0, tempBitboards[i], 0, 120);
         }
 
         //simulates move change
         tempBitboards[currentBitboard][currentLocation] = 0;
-        tempBitboards[nextBitboard][nextLocation] = 0;
+        if (nextBitboard != -1) {
+            tempBitboards[nextBitboard][nextLocation] = 0;
+        }
         tempBitboards[currentBitboard][nextLocation] = 1;
 
         //simulates king location change
         if (currentBitboard == 4 || currentBitboard == 10) {
             tempKingLocations[currentBitboard / 6] = nextLocation;
-            System.out.println("The new king location is " + nextLocation);
         }
 
-        return BOARD.isKingChecked(tempBitboards, currentBitboard / 6, tempKingLocations);
+        return BoardMethods.isKingChecked(tempBitboards, tempKingLocations, currentBitboard / 6);
     }
 
     //finds all possible moves for a side
-    public HashMap<Integer, Integer> allAvailableMoves(int[][] bitboards, int side) {
-        HashMap<Integer, Integer> possibleMovesForSide = new HashMap<Integer, Integer>();
+    public static MoveSet allAvailableMoves(int[][] bitboards, int[] kingLocations, int side) {
+        MoveSet possibleMovesForSide = new MoveSet();
         for (int i = side * 6; i < (side * 6) + 6; i++) {
             for (int j = 0; j < bitboards[0].length; j++) {
                 if (bitboards[i][j] != 1) {
                     continue;
                 }
                 //checks each piece to see if it removes the check
-                HashMap<Integer, Integer> possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards);
-                possibleMovesForSide.putAll(possibleMovesForPiece);
-                for (Map.Entry<Integer, Integer> possibleMove : possibleMovesForPiece.entrySet()) {
+                MoveSet possibleMovesForPiece = possibleMoveFinderAllPieces(j, bitboards, i);
+                possibleMovesForSide.addAll(possibleMovesForPiece);
+                for (Move possibleMove : possibleMovesForPiece) {
                     //if check is maintained then remove the move. it is impossible to make
-                    if (willThisMovePutOurKingInCheck(j, i, possibleMove.getKey(), possibleMove.getValue())) {
-                        possibleMovesForSide.remove(possibleMove.getKey());
+                    if (willThisMovePutOurKingInCheck(bitboards, kingLocations, possibleMove)) {
+                        possibleMovesForSide.remove(possibleMove.getMoveLocation());
                     }
                 }
 
@@ -402,6 +403,4 @@ public class ValidMoves {
         }
         return possibleMovesForSide;
     }
-
 }
-
