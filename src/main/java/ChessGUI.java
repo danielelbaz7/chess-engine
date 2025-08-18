@@ -1,3 +1,5 @@
+package main.java;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
@@ -36,7 +38,7 @@ public class ChessGUI {
         for (int i = 0; i < 64; i++) {
             JLabel b = new JLabel();
             b.setOpaque(true);
-            String imgSrc = "./src/Assets/";
+            String imgSrc = "./src/main.resources.Assets/";
 
             String currentPiece = mainBoard[2 + (i / 8)][1 + (i % 8)];
 

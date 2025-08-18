@@ -1,3 +1,5 @@
+package main.java;
+
 public class Conv {
 
     public static int to64From120(int location120) {
