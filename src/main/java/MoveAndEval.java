@@ -1,3 +1,5 @@
+package main.java;
+
 public class MoveAndEval<Move, Double> {
 
     public Move getMove() {

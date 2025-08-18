@@ -1,4 +1,6 @@
-//used to look at and check a Board object
+package main.java;
+
+//used to look at and check a main.java.Board object
 public class BoardMethods {
 
     //gui usage
@@ -64,8 +66,8 @@ public class BoardMethods {
                 if (bitboards[i][j] == 1) {
                     //if there is a piece there, find the value and find its distance from the center and multiply that by the base value
 
-                    /*double centerDistance = Math.abs(Conv.to64From120(j) % 8 - 3.5);
-                    double heightDistance = Math.abs(Conv.to64From120(j) / 8 - 3.5);
+                    /*double centerDistance = Math.abs(main.java.Conv.to64From120(j) % 8 - 3.5);
+                    double heightDistance = Math.abs(main.java.Conv.to64From120(j) / 8 - 3.5);
                     totalScore += (baseValue / (centerDistance * heightDistance)) / 4;*/
 
                     totalScore += baseValue;
