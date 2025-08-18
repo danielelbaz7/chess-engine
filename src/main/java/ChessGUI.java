@@ -187,7 +187,6 @@ public class ChessGUI {
                                     "<br>" + "↻" + "</html>");
                             Board b = new Board(board);
                             bestMoveAndEval = ArtificialIntelligence.findBestMove(b, AIDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.whiteTurn);
-                            System.out.println(bestMoveAndEval.getEval());
                             bestMove.setText("<html>" + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getCurrentLocation())) / 8) + 1) +
                                     "<br>" + "\uD83E\uDC1F" + "<br>" + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) % 8) + 1) + ", " + (((Conv.to64From120(bestMoveAndEval.getMove().getMoveLocation())) / 8) + 1) + "<br>" + " " + "</html>");
                             GameplayController.allowMovement = true;
