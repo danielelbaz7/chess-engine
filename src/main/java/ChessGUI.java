@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Objects;
 
 public class ChessGUI {
 
@@ -55,7 +56,7 @@ public class ChessGUI {
         for (int i = 0; i < 64; i++) {
             JLabel b = new JLabel();
             b.setOpaque(true);
-            String imgSrc = "./src/Assets/";
+            String imgSrc = "/Assets/";
 
             String currentPiece = mainBoard[2 + (i / 8)][1 + (i % 8)];
 
@@ -90,7 +91,7 @@ public class ChessGUI {
             }
 
             //resizes image
-            ImageIcon currentPieceImageIcon = new ImageIcon(imgSrc);
+            ImageIcon currentPieceImageIcon = new ImageIcon(Objects.requireNonNull(ChessGUI.class.getResource(imgSrc)));
             Image currentPieceImage = currentPieceImageIcon.getImage();
             Image tempImg = currentPieceImage.getScaledInstance(dimension / 16, dimension / 16, Image.SCALE_SMOOTH);
             currentPieceImageIcon.setImage(tempImg);
@@ -112,10 +113,13 @@ public class ChessGUI {
 
     private void initializeTitlePanel() {
         //creates a title for the game alongside a checkbox that determines if the evaluator will be shown
-        titlePanel.setLayout(new GridLayout(1, 3));
+        titlePanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 8, 0, 8);
 
         JLabel titleAndCheckBox = new JLabel("Chess Engine");
-        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension / 50));
+        titleAndCheckBox.setFont(new Font(Font.SANS_SERIF, Font.BOLD, dimension / 70));
         titleAndCheckBox.setForeground(Color.BLACK);
 
         JLabel authorText = new JLabel("Created By: Daniel Elbaz");
@@ -127,7 +131,6 @@ public class ChessGUI {
 
 
         titlePanel.add(titleAndCheckBox);
-        titlePanel.add(authorText);
         titlePanel.add(showEvaluationCheckBox);
         titlePanel.add(artificialIntelligenceAssistantButton);
         titlePanel.add(showAIBestMove);
@@ -147,7 +150,7 @@ public class ChessGUI {
                 }
             }
         });
-        showAIBestMove.setText("Show best move?");
+        showAIBestMove.setText("Show Best Move");
         return showAIBestMove;
     }
 
@@ -163,7 +166,7 @@ public class ChessGUI {
                 }
             }
         });
-        showEvaluationCheckBox.setText("Show evaluation?");
+        showEvaluationCheckBox.setText("Show Eval");
         return showEvaluationCheckBox;
     }
 
@@ -194,7 +197,7 @@ public class ChessGUI {
                 }
             }
         });
-        artificialIntelligenceAssistantButton.setText("Generate best move with AI?");
+        artificialIntelligenceAssistantButton.setText("Generate Best Move");
         return artificialIntelligenceAssistantButton;
     }
 
